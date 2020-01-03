@@ -32,6 +32,7 @@
 #include "stuffer/s2n_stuffer.h"
 
 #include "tls/s2n_tls.h"
+#include "tls/s2n_crypto.h"
 #include "tls/s2n_tls13.h"
 #include "utils/s2n_safety.h"
 #include "utils/s2n_blob.h"
@@ -108,8 +109,7 @@ int s2n_client_extensions_send(struct s2n_connection *conn, struct s2n_stuffer *
     const uint8_t ecc_extension_required = s2n_ecc_extension_required(cipher_preferences);
     if (ecc_extension_required) {
         /* Write ECC extensions: Supported Curves and Supported Point Formats */
-        int ec_curves_count = s2n_array_len(s2n_ecc_supported_curves);
-        total_size += 12 + ec_curves_count * 2;
+        total_size += 12 + s2n_ecc_evp_supported_curves_list_len * 2;
     }
 
     const uint8_t pq_kem_extension_required = s2n_pq_kem_extension_required(cipher_preferences);
@@ -204,14 +204,13 @@ int s2n_client_extensions_send(struct s2n_connection *conn, struct s2n_stuffer *
      * Supported Groups in TLS 1.3 RFC 8446) and the Supported Point Formats Extension.
      */
     if (ecc_extension_required) {
-        int ec_curves_count = s2n_array_len(s2n_ecc_supported_curves);
         GUARD(s2n_stuffer_write_uint16(out, TLS_EXTENSION_SUPPORTED_GROUPS));
-        GUARD(s2n_stuffer_write_uint16(out, 2 + ec_curves_count * 2));
+        GUARD(s2n_stuffer_write_uint16(out, 2 + s2n_ecc_evp_supported_curves_list_len * 2));
         /* Curve list len */
-        GUARD(s2n_stuffer_write_uint16(out, ec_curves_count * 2));
+        GUARD(s2n_stuffer_write_uint16(out, s2n_ecc_evp_supported_curves_list_len * 2));
         /* Curve list */
-        for (int i = 0; i < ec_curves_count; i++) {
-            GUARD(s2n_stuffer_write_uint16(out, s2n_ecc_supported_curves[i]->iana_id));
+        for (int i = 0; i < s2n_ecc_evp_supported_curves_list_len; i++) {
+            GUARD(s2n_stuffer_write_uint16(out, s2n_ecc_evp_supported_curves_list[i]->iana_id));
         }
 
         GUARD(s2n_stuffer_write_uint16(out, TLS_EXTENSION_EC_POINT_FORMATS));
@@ -440,9 +439,9 @@ static int s2n_recv_client_supported_groups(struct s2n_connection *conn, struct 
     proposed_curves.data = s2n_stuffer_raw_read(extension, proposed_curves.size);
     notnull_check(proposed_curves.data);
 
-    if (s2n_ecc_find_supported_curve(&proposed_curves, &conn->secure.server_ecc_params.negotiated_curve) != 0) {
+    if (s2n_ecc_evp_find_supported_curve(&proposed_curves, &conn->secure.server_ecc_evp_params.negotiated_curve) != 0) {
         /* Can't agree on a curve, ECC is not allowed. Return success to proceed with the handshake. */
-        conn->secure.server_ecc_params.negotiated_curve = NULL;
+        conn->secure.server_ecc_evp_params.negotiated_curve = NULL;
     }
     return 0;
 }

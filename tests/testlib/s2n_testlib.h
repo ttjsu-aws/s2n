@@ -127,4 +127,4 @@ int s2n_test_kem_with_kat(const struct s2n_kem *kem, const char *kat_file);
     EXPECT_EQUAL(s2n_stuffer_data_available(stuffer), 0);       \
 } while (0)
 
-int s2n_public_ecc_keys_are_equal(struct s2n_ecc_params *params_1, struct s2n_ecc_params *params_2);
+int s2n_public_ecc_keys_are_equal(struct s2n_ecc_evp_params *params_1, struct s2n_ecc_evp_params *params_2);

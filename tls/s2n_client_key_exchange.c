@@ -138,12 +138,26 @@ int s2n_dhe_client_key_recv(struct s2n_connection *conn, struct s2n_blob *shared
 
 int s2n_ecdhe_client_key_recv(struct s2n_connection *conn, struct s2n_blob *shared_key)
 {
-    struct s2n_stuffer *in = &conn->handshake.io;
+    struct s2n_ecc_evp_params *server_key = &conn->secure.server_ecc_evp_params;
+    notnull_check(server_key);
 
-    /* Get the shared key */
-    GUARD(s2n_ecc_compute_shared_secret_as_server(&conn->secure.server_ecc_params, in, shared_key));
+    /* for now we do this tedious loop to find the matching client key selection.
+     * this can be simplified if we get an index or a pointer to a specific key */
+    int selection = -1;
+    for (int i = 0; i < s2n_ecc_evp_supported_curves_list_len; i++) {
+        if (server_key->negotiated_curve->iana_id == s2n_ecc_evp_supported_curves_list[i]->iana_id) {
+            selection = i;
+            break;
+        }
+    }
+
+    S2N_ERROR_IF(selection < 0, S2N_ERR_BAD_KEY_SHARE);
+    struct s2n_ecc_evp_params *client_key = &conn->secure.client_ecc_evp_params[selection];
+    notnull_check(client_key);
+    GUARD(s2n_ecc_evp_compute_shared_secret_from_params(server_key, client_key, shared_key));
+
     /* We don't need the server params any more */
-    GUARD(s2n_ecc_params_free(&conn->secure.server_ecc_params));
+    GUARD(s2n_ecc_evp_params_free(&conn->secure.server_ecc_evp_params));
     return 0;
 }
 
@@ -193,11 +207,26 @@ int s2n_dhe_client_key_send(struct s2n_connection *conn, struct s2n_blob *shared
 
 int s2n_ecdhe_client_key_send(struct s2n_connection *conn, struct s2n_blob *shared_key)
 {
-    struct s2n_stuffer *out = &conn->handshake.io;
-    GUARD(s2n_ecc_compute_shared_secret_as_client(&conn->secure.server_ecc_params, out, shared_key));
+    struct s2n_ecc_evp_params *server_key = &conn->secure.server_ecc_evp_params;
+    notnull_check(server_key);
+
+    /* for now we do this tedious loop to find the matching client key selection.
+     * this can be simplified if we get an index or a pointer to a specific key */
+    int selection = -1;
+    for (int i = 0; i < s2n_ecc_evp_supported_curves_list_len; i++) {
+        if (server_key->negotiated_curve->iana_id == s2n_ecc_evp_supported_curves_list[i]->iana_id) {
+            selection = i;
+            break;
+        }
+    }
+
+    S2N_ERROR_IF(selection < 0, S2N_ERR_BAD_KEY_SHARE);
+    struct s2n_ecc_evp_params *client_key = &conn->secure.client_ecc_evp_params[selection];
+    notnull_check(client_key);
+    GUARD(s2n_ecc_evp_compute_shared_secret_from_params(client_key, server_key, shared_key));
 
     /* We don't need the server params any more */
-    GUARD(s2n_ecc_params_free(&conn->secure.server_ecc_params));
+    GUARD(s2n_ecc_evp_params_free(&conn->secure.server_ecc_evp_params));
     return 0;
 }
 
