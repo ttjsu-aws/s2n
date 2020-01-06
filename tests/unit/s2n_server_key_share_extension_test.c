@@ -306,14 +306,14 @@ int main(int argc, char **argv)
 
             /* Server generates shared key based on Server's Key (EC Key) and Client's public key (EC Point) */
             struct s2n_blob server_shared_secret = { 0 };
-            EXPECT_SUCCESS(s2n_ecc_compute_shared_secret_from_params(
+            EXPECT_SUCCESS(s2n_ecc_evp_compute_shared_secret_from_params(
                 &server_conn->secure.server_ecc_evp_params,
                 &server_conn->secure.client_ecc_evp_params[i],
                 &server_shared_secret));
 
             /* Clients generates shared key based on Client's EC Key and Server's public key */
             struct s2n_blob client_shared_secret = { 0 };
-            EXPECT_SUCCESS(s2n_ecc_compute_shared_secret_from_params(
+            EXPECT_SUCCESS(s2n_ecc_evp_compute_shared_secret_from_params(
                 &client_conn->secure.client_ecc_evp_params[i],
                 &client_conn->secure.server_ecc_evp_params,
                 &client_shared_secret));
