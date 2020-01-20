@@ -202,6 +202,8 @@ int s2n_ecc_evp_compute_shared_secret_as_server(struct s2n_ecc_evp_params *ecc_e
         GUARD_OSSL(EVP_PKEY_paramgen_init(pctx), S2N_ERR_ECDHE_SERIALIZING);
         GUARD_OSSL(EVP_PKEY_CTX_set_ec_paramgen_curve_nid(pctx, ecc_evp_params->negotiated_curve->libcrypto_nid), S2N_ERR_ECDHE_SERIALIZING);
         GUARD(EVP_PKEY_paramgen(pctx, &peer_key));
+        /* Documentation: https://www.openssl.org/docs/manmaster/man3/EVP_PKEY_public_check.html */
+        GUARD_OSSL(EVP_PKEY_public_check(pctx),S2N_ERR_KEY_CHECK);
     }
     GUARD_OSSL(EVP_PKEY_set1_tls_encodedpoint(peer_key, client_public_blob.data, client_public_blob.size),
                S2N_ERR_ECDHE_SERIALIZING);
@@ -214,6 +216,10 @@ int s2n_ecc_evp_compute_shared_secret_as_server(struct s2n_ecc_evp_params *ecc_e
     S2N_ERROR_IF(point == NULL, S2N_ERR_BAD_MESSAGE);
 
     int success = EC_KEY_set_public_key(ec_key, point);
+   
+    /* Documentation: https://www.openssl.org/docs/manmaster/man3/EC_KEY_check_key.html */
+    GUARD_OSSL(EC_KEY_check_key(ec_key), S2N_ERR_KEY_CHECK);
+
     GUARD_OSSL(EVP_PKEY_set1_EC_KEY(peer_key, ec_key), S2N_ERR_ECDHE_SERIALIZING);
     S2N_ERROR_IF(success == 0, S2N_ERR_BAD_MESSAGE);
 #endif
@@ -401,6 +407,8 @@ int s2n_ecc_evp_parse_params_point(struct s2n_blob *point_blob, struct s2n_ecc_e
         S2N_ERROR_IF(pctx == NULL, S2N_ERR_ECDHE_SERIALIZING);
         GUARD_OSSL(EVP_PKEY_paramgen_init(pctx), S2N_ERR_ECDHE_SERIALIZING);
         GUARD_OSSL(EVP_PKEY_CTX_set_ec_paramgen_curve_nid(pctx, ecc_evp_params->negotiated_curve->libcrypto_nid), S2N_ERR_ECDHE_SERIALIZING);
+        /* Documentation: https://www.openssl.org/docs/manmaster/man3/EVP_PKEY_public_check.html */
+        GUARD_OSSL(EVP_PKEY_public_check(pctx),S2N_ERR_KEY_CHECK);
         GUARD(EVP_PKEY_paramgen(pctx, &ecc_evp_params->evp_pkey));
     }
     GUARD_OSSL(EVP_PKEY_set1_tls_encodedpoint(ecc_evp_params->evp_pkey, point_blob->data, point_blob->size),
@@ -421,6 +429,9 @@ int s2n_ecc_evp_parse_params_point(struct s2n_blob *point_blob, struct s2n_ecc_e
 
     /* Set the point as the public key */
     int success = EC_KEY_set_public_key(ec_key, point);
+
+    /* Documentation: https://www.openssl.org/docs/manmaster/man3/EC_KEY_check_key.html */
+    GUARD_OSSL(EC_KEY_check_key(ec_key), S2N_ERR_KEY_CHECK);
 
     GUARD_OSSL(EVP_PKEY_set1_EC_KEY(ecc_evp_params->evp_pkey,ec_key), S2N_ERR_ECDHE_SERIALIZING);
 
