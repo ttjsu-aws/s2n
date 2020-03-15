@@ -19,6 +19,7 @@
 
 #include "tls/s2n_tls.h"
 #include "tls/extensions/s2n_key_share.h"
+#include "crypto/s2n_ecc_evp.h"
 
 #include "testlib/s2n_testlib.h"
 #include "stuffer/s2n_stuffer.h"
@@ -33,7 +34,7 @@ int main(int argc, char **argv)
         struct s2n_stuffer out;
 
         struct s2n_ecc_evp_params ecc_evp_params;
-        const struct s2n_ecc_named_curve *curve = s2n_ecc_evp_supported_curves_list[0];
+        const struct s2n_ecc_named_curve *curve = &s2n_ecc_curve_secp256r1;
         ecc_evp_params.negotiated_curve = curve;
         ecc_evp_params.evp_pkey = NULL;
 
@@ -52,7 +53,7 @@ int main(int argc, char **argv)
         struct s2n_stuffer out;
 
         struct s2n_ecc_evp_params ecc_evp_params;
-        const struct s2n_ecc_named_curve *good_curve = s2n_ecc_evp_supported_curves_list[0];
+        const struct s2n_ecc_named_curve *good_curve = &s2n_ecc_curve_secp256r1;
         const struct s2n_ecc_named_curve curve = {
             .iana_id = 12345,
             .libcrypto_nid = 0,
