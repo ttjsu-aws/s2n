@@ -27,6 +27,4 @@ struct s2n_ecc_preferences {
 extern const struct s2n_ecc_preferences s2n_ecc_preferences_20140601;
 extern const struct s2n_ecc_preferences s2n_ecc_preferences_20200310;
 
-extern const size_t s2n_ecc_evp_supported_curves_list_len;
-
 int s2n_config_set_ecc_preferences(struct s2n_config *config, const char *version);

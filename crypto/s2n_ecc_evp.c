@@ -70,15 +70,7 @@ const static struct s2n_ecc_named_curve *const supported_curves_list[] = {
 #endif
 };
 
-const struct s2n_ecc_named_curve *const s2n_ecc_evp_supported_curves_list[] = {
-    &s2n_ecc_curve_secp256r1,
-    &s2n_ecc_curve_secp384r1,
-#if MODERN_EC_SUPPORTED	
-    &s2n_ecc_curve_x25519,	
-#endif
-};
-
-const size_t s2n_ecc_evp_supported_curves_list_len = s2n_array_len(s2n_ecc_evp_supported_curves_list);
+const static size_t supported_curves_list_len = s2n_array_len(supported_curves_list);
 
 #if MODERN_EC_SUPPORTED
 static int s2n_ecc_evp_generate_key_x25519(const struct s2n_ecc_named_curve *named_curve, EVP_PKEY **evp_pkey);
@@ -219,7 +211,7 @@ int s2n_ecc_evp_compute_shared_secret_as_server(struct s2n_ecc_evp_params *ecc_e
         S2N_ERROR_IF(pctx == NULL, S2N_ERR_ECDHE_SERIALIZING);
         GUARD_OSSL(EVP_PKEY_paramgen_init(pctx), S2N_ERR_ECDHE_SERIALIZING);
         GUARD_OSSL(EVP_PKEY_CTX_set_ec_paramgen_curve_nid(pctx, ecc_evp_params->negotiated_curve->libcrypto_nid), S2N_ERR_ECDHE_SERIALIZING);
-        GUARD(EVP_PKEY_paramgen(pctx, &peer_key));
+        GUARD_OSSL(EVP_PKEY_paramgen(pctx, &peer_key), S2N_ERR_ECDHE_SERIALIZING);
     }
     GUARD_OSSL(EVP_PKEY_set1_tls_encodedpoint(peer_key, client_public_blob.data, client_public_blob.size),
                S2N_ERR_ECDHE_SERIALIZING);
@@ -421,7 +413,7 @@ int s2n_ecc_evp_parse_params_point(struct s2n_blob *point_blob, struct s2n_ecc_e
         S2N_ERROR_IF(pctx == NULL, S2N_ERR_ECDHE_SERIALIZING);
         GUARD_OSSL(EVP_PKEY_paramgen_init(pctx), S2N_ERR_ECDHE_SERIALIZING);
         GUARD_OSSL(EVP_PKEY_CTX_set_ec_paramgen_curve_nid(pctx, ecc_evp_params->negotiated_curve->libcrypto_nid), S2N_ERR_ECDHE_SERIALIZING);
-        GUARD(EVP_PKEY_paramgen(pctx, &ecc_evp_params->evp_pkey));
+        GUARD_OSSL(EVP_PKEY_paramgen(pctx, &ecc_evp_params->evp_pkey), S2N_ERR_ECDHE_SERIALIZING);
     }
     GUARD_OSSL(EVP_PKEY_set1_tls_encodedpoint(ecc_evp_params->evp_pkey, point_blob->data, point_blob->size),
                S2N_ERR_ECDHE_SERIALIZING);
@@ -464,7 +456,7 @@ int s2n_ecc_evp_find_supported_curve(struct s2n_blob *iana_ids, const struct s2n
 
     GUARD(s2n_stuffer_init(&iana_ids_in, iana_ids));
     GUARD(s2n_stuffer_write(&iana_ids_in, iana_ids));
-    for (int i = 0; i < s2n_array_len(supported_curves_list); i++) {
+    for (int i = 0; i < supported_curves_list_len; i++) {
         const struct s2n_ecc_named_curve *supported_curve = supported_curves_list[i];
         for (int j = 0; j < iana_ids->size / 2; j++) {
             uint16_t iana_id;

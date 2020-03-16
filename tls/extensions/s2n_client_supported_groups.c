@@ -19,18 +19,23 @@
 #include "tls/extensions/s2n_client_supported_groups.h"
 #include "tls/s2n_tls.h"
 #include "tls/s2n_tls_parameters.h"
+#include "tls/s2n_ecc_preferences.h"
 
 #include "utils/s2n_safety.h"
 
 int s2n_extensions_client_supported_groups_send(struct s2n_connection *conn, struct s2n_stuffer *out)
 {
+    notnull_check(conn);
+    const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
+    notnull_check(ecc_pref);
+
     GUARD(s2n_stuffer_write_uint16(out, TLS_EXTENSION_SUPPORTED_GROUPS));
-    GUARD(s2n_stuffer_write_uint16(out, 2 + s2n_ecc_evp_supported_curves_list_len * 2));
+    GUARD(s2n_stuffer_write_uint16(out, 2 + ecc_pref->count * 2));
     /* Curve list len */
-    GUARD(s2n_stuffer_write_uint16(out, s2n_ecc_evp_supported_curves_list_len * 2));
+    GUARD(s2n_stuffer_write_uint16(out, ecc_pref->count * 2));
     /* Curve list */
-    for (int i = 0; i < s2n_ecc_evp_supported_curves_list_len; i++) {
-        GUARD(s2n_stuffer_write_uint16(out, s2n_ecc_evp_supported_curves_list[i]->iana_id));
+    for (int i = 0; i < ecc_pref->count; i++) {
+        GUARD(s2n_stuffer_write_uint16(out, ecc_pref->ecc_curves[i]->iana_id));
     }
 
     GUARD(s2n_stuffer_write_uint16(out, TLS_EXTENSION_EC_POINT_FORMATS));
