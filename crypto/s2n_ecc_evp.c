@@ -62,6 +62,14 @@ const struct s2n_ecc_named_curve s2n_ecc_curve_x25519 = {
 };
 #endif
 
+const static struct s2n_ecc_named_curve *const supported_curves_list[] = {
+    &s2n_ecc_curve_secp256r1,
+    &s2n_ecc_curve_secp384r1,
+#if MODERN_EC_SUPPORTED
+    &s2n_ecc_curve_x25519,
+#endif
+};
+
 const struct s2n_ecc_named_curve *const s2n_ecc_evp_supported_curves_list[] = {
     &s2n_ecc_curve_secp256r1,
     &s2n_ecc_curve_secp384r1,
@@ -456,8 +464,8 @@ int s2n_ecc_evp_find_supported_curve(struct s2n_blob *iana_ids, const struct s2n
 
     GUARD(s2n_stuffer_init(&iana_ids_in, iana_ids));
     GUARD(s2n_stuffer_write(&iana_ids_in, iana_ids));
-    for (int i = 0; i < s2n_ecc_evp_supported_curves_list_len; i++) {
-        const struct s2n_ecc_named_curve *supported_curve = s2n_ecc_evp_supported_curves_list[i];
+    for (int i = 0; i < s2n_array_len(supported_curves_list); i++) {
+        const struct s2n_ecc_named_curve *supported_curve = supported_curves_list[i];
         for (int j = 0; j < iana_ids->size / 2; j++) {
             uint16_t iana_id;
             GUARD(s2n_stuffer_read_uint16(&iana_ids_in, &iana_id));
