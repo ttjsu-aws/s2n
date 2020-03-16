@@ -39,8 +39,8 @@ extern const struct s2n_ecc_named_curve s2n_ecc_curve_secp384r1;
  * the future. See https://github.com/google/boringssl/blob/master/crypto/evp/p_x25519_asn1.c#L233
  */
 #if S2N_OPENSSL_VERSION_AT_LEAST(1, 1, 0) && !defined(LIBRESSL_VERSION_NUMBER) && !defined(OPENSSL_IS_BORINGSSL)
-#define S2N_ECC_EVP_SUPPORTED_CURVES_COUNT 3
 #define MODERN_EC_SUPPORTED 1
+#define S2N_ECC_EVP_SUPPORTED_CURVES_COUNT 3
 extern const struct s2n_ecc_named_curve s2n_ecc_curve_x25519;
 #else
 #define S2N_ECC_EVP_SUPPORTED_CURVES_COUNT 2
