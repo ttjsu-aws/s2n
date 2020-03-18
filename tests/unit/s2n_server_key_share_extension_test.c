@@ -265,8 +265,10 @@ int main(int argc, char **argv)
 
     /* Test Shared Key Generation */
     {
+        const struct s2n_ecc_preferences *ecc_pref = NULL;
         int shared_secret_size[3] = { 32, 48, 32 };
-        for (int i = 0; i < 3; i++)
+        int i = 0;
+        do
         {
             struct s2n_connection *client_conn;
             struct s2n_connection *server_conn;
@@ -275,7 +277,8 @@ int main(int argc, char **argv)
 
             EXPECT_NOT_NULL(client_conn = s2n_connection_new(S2N_CLIENT));
             EXPECT_NOT_NULL(server_conn = s2n_connection_new(S2N_SERVER));
-            const struct s2n_ecc_preferences *ecc_pref = server_conn->config->ecc_preferences;
+            ecc_pref = server_conn->config->ecc_preferences;
+            notnull_check(ecc_pref);
             
             EXPECT_SUCCESS(s2n_stuffer_growable_alloc(&client_hello_key_share, 1024));
             EXPECT_SUCCESS(s2n_stuffer_growable_alloc(&server_hello_key_share, 1024));
@@ -346,11 +349,8 @@ int main(int argc, char **argv)
             EXPECT_SUCCESS(s2n_stuffer_free(&server_hello_key_share));
             EXPECT_SUCCESS(s2n_connection_free(client_conn));
             EXPECT_SUCCESS(s2n_connection_free(server_conn));
-
-            if (ecc_pref->count == i-1) {
-                break;
-            }
-        }
+            i += 1;
+        } while (i < ecc_pref->count);
     }
 
     END_TEST();
