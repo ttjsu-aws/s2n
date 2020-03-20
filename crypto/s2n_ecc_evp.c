@@ -62,7 +62,7 @@ const struct s2n_ecc_named_curve s2n_ecc_curve_x25519 = {
 };
 #endif
 
-const static struct s2n_ecc_named_curve *const supported_curves_list[] = {
+const struct s2n_ecc_named_curve *const s2n_supported_curves_list[] = {
     &s2n_ecc_curve_secp256r1,
     &s2n_ecc_curve_secp384r1,
 #if MODERN_EC_SUPPORTED
@@ -70,7 +70,7 @@ const static struct s2n_ecc_named_curve *const supported_curves_list[] = {
 #endif
 };
 
-const static size_t supported_curves_list_len = s2n_array_len(supported_curves_list);
+const size_t s2n_supported_curves_list_len = s2n_array_len(s2n_supported_curves_list);
 
 #if MODERN_EC_SUPPORTED
 static int s2n_ecc_evp_generate_key_x25519(const struct s2n_ecc_named_curve *named_curve, EVP_PKEY **evp_pkey);
@@ -244,7 +244,7 @@ int s2n_ecc_evp_compute_shared_secret_as_client(struct s2n_ecc_evp_params *ecc_e
     S2N_ERROR_IF(client_params.evp_pkey == NULL, S2N_ERR_ECDHE_GEN_KEY);
 
     if (s2n_ecc_evp_compute_shared_secret(client_params.evp_pkey, ecc_evp_params->evp_pkey, 
-                                          ecc_evp_params->negotiated_curve->iana_id, shared_key) != 0) {
+                                          ecc_evp_params->negotiated_curve->iana_id, shared_key) != S2N_SUCCESS) {
         S2N_ERROR(S2N_ERR_ECDHE_SHARED_SECRET);
     }
 
@@ -456,8 +456,8 @@ int s2n_ecc_evp_find_supported_curve(struct s2n_blob *iana_ids, const struct s2n
 
     GUARD(s2n_stuffer_init(&iana_ids_in, iana_ids));
     GUARD(s2n_stuffer_write(&iana_ids_in, iana_ids));
-    for (int i = 0; i < supported_curves_list_len; i++) {
-        const struct s2n_ecc_named_curve *supported_curve = supported_curves_list[i];
+    for (int i = 0; i < s2n_supported_curves_list_len; i++) {
+        const struct s2n_ecc_named_curve *supported_curve = s2n_supported_curves_list[i];
         for (int j = 0; j < iana_ids->size / 2; j++) {
             uint16_t iana_id;
             GUARD(s2n_stuffer_read_uint16(&iana_ids_in, &iana_id));

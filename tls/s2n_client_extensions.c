@@ -88,6 +88,7 @@ int s2n_client_extensions_send(struct s2n_connection *conn, struct s2n_stuffer *
     const struct s2n_cipher_preferences *cipher_preferences;
     GUARD(s2n_connection_get_cipher_preferences(conn, &cipher_preferences));
 
+    notnull_check(conn->config);
     const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
     notnull_check(ecc_pref);
 

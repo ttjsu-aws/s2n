@@ -203,6 +203,7 @@ static int s2n_parse_client_hello(struct s2n_connection *conn)
     GUARD(s2n_stuffer_read_uint8(in, &num_compression_methods));
     GUARD(s2n_stuffer_skip_read(in, num_compression_methods));
 
+    notnull_check(conn->config);
     const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
     notnull_check(ecc_pref);
 

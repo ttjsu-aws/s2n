@@ -225,6 +225,7 @@ int main(int argc, char **argv)
         EXPECT_SUCCESS(s2n_connection_set_cipher_preferences(conn, "test_ecdsa_priority"));
         EXPECT_SUCCESS(s2n_config_set_ecc_preferences(conn->config, "default"));
         const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
+        EXPECT_NOT_NULL(ecc_pref);
         /* Assume default for negotiated curve. */
         /* Shouldn't be necessary unless the test fails, but we want the failure to be obvious. */
         conn->secure.server_ecc_evp_params.negotiated_curve = ecc_pref->ecc_curves[0];
@@ -564,7 +565,7 @@ int main(int argc, char **argv)
             conn->server_protocol_version = S2N_TLS12; /* server configured with TLS 1.2 */
             conn->actual_protocol_version = S2N_TLS12;
             conn->client_protocol_version = S2N_TLS13; /* a TLS 1.3 client */
-            conn->secure.server_ecc_evp_params.negotiated_curve = s2n_ecc_evp_supported_curves_list[0];
+            conn->secure.server_ecc_evp_params.negotiated_curve = s2n_supported_curves_list[0];
 
             EXPECT_SUCCESS(s2n_set_cipher_as_tls_server(conn, test_wire_ciphers, count));
             EXPECT_EQUAL(conn->secure.cipher_suite, &s2n_ecdhe_rsa_with_aes_128_gcm_sha256);

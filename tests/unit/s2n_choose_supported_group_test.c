@@ -31,9 +31,9 @@ int main(int argc, char **argv)
         /* If the list of mutually supported groups is empty, chosen curve should be set to null */
         EXPECT_NOT_NULL(server_conn = s2n_connection_new(S2N_SERVER));
         EXPECT_NULL(server_conn->secure.server_ecc_evp_params.negotiated_curve);
-        notnull_check(server_conn->config);
+        EXPECT_NOT_NULL(server_conn->config);
         const struct s2n_ecc_preferences *ecc_pref = server_conn->config->ecc_preferences;
-        notnull_check(ecc_pref);
+        EXPECT_NOT_NULL(ecc_pref);
         for (int i = 0; i < ecc_pref->count; i++) {
             EXPECT_NULL(server_conn->secure.mutually_supported_groups[i]);
         }
@@ -50,9 +50,9 @@ int main(int argc, char **argv)
          * match.
          */
         EXPECT_NOT_NULL(server_conn = s2n_connection_new(S2N_SERVER));
-        notnull_check(server_conn->config);
+        EXPECT_NOT_NULL(server_conn->config);
         const struct s2n_ecc_preferences *ecc_pref = server_conn->config->ecc_preferences;
-        notnull_check(ecc_pref);
+        EXPECT_NOT_NULL(ecc_pref);
         EXPECT_NULL(server_conn->secure.server_ecc_evp_params.negotiated_curve);
         server_conn->secure.mutually_supported_groups[1] = ecc_pref->ecc_curves[1];
 
@@ -70,9 +70,9 @@ int main(int argc, char **argv)
          */
         EXPECT_NOT_NULL(server_conn = s2n_connection_new(S2N_SERVER));
         EXPECT_NULL(server_conn->secure.server_ecc_evp_params.negotiated_curve);
-        notnull_check(server_conn->config);
+        EXPECT_NOT_NULL(server_conn->config);
         const struct s2n_ecc_preferences *ecc_pref = server_conn->config->ecc_preferences;
-        notnull_check(ecc_pref);
+        EXPECT_NOT_NULL(ecc_pref);
         for (int i = 0; i < ecc_pref->count; i++) {
             server_conn->secure.mutually_supported_groups[i] = ecc_pref->ecc_curves[i];
         }

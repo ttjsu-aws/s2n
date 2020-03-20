@@ -274,7 +274,9 @@ int main(int argc, char **argv)
             struct s2n_connection *conn;
             EXPECT_NOT_NULL(conn = s2n_connection_new(S2N_SERVER));
             EXPECT_SUCCESS(s2n_connection_set_config(conn, config));
+            EXPECT_NOT_NULL(conn->config);
             const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
+            EXPECT_NOT_NULL(ecc_pref);
             struct s2n_stuffer *hello_stuffer = &conn->handshake.io;
             conn->secure.server_ecc_evp_params.negotiated_curve = ecc_pref->ecc_curves[0];
 
@@ -317,7 +319,9 @@ int main(int argc, char **argv)
             struct s2n_connection *conn;
             EXPECT_NOT_NULL(conn = s2n_connection_new(S2N_SERVER));
             EXPECT_SUCCESS(s2n_connection_set_config(conn, config));
+            EXPECT_NOT_NULL(conn->config);
             const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
+            EXPECT_NOT_NULL(ecc_pref);
             struct s2n_stuffer *hello_stuffer = &conn->handshake.io;
             conn->secure.server_ecc_evp_params.negotiated_curve = ecc_pref->ecc_curves[0];
             /* secure renegotiation is requested */
@@ -359,7 +363,9 @@ int main(int argc, char **argv)
             struct s2n_connection *conn;
             EXPECT_NOT_NULL(conn = s2n_connection_new(S2N_SERVER));
             EXPECT_SUCCESS(s2n_connection_set_config(conn, config));
+            EXPECT_NOT_NULL(conn->config);
             const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
+            EXPECT_NOT_NULL(ecc_pref);
             struct s2n_stuffer *hello_stuffer = &conn->handshake.io;
             conn->secure.server_ecc_evp_params.negotiated_curve = ecc_pref->ecc_curves[0];
 
@@ -416,7 +422,9 @@ int main(int argc, char **argv)
             struct s2n_connection *conn;
             EXPECT_NOT_NULL(conn = s2n_connection_new(S2N_SERVER));
             EXPECT_SUCCESS(s2n_connection_set_config(conn, config));
+            EXPECT_NOT_NULL(conn->config);
             const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
+            EXPECT_NOT_NULL(ecc_pref);
             struct s2n_stuffer *hello_stuffer = &conn->handshake.io;
             conn->secure.server_ecc_evp_params.negotiated_curve = ecc_pref->ecc_curves[0];
 

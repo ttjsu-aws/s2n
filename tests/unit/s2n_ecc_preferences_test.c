@@ -48,33 +48,7 @@ int main(int argc, char **argv)
 
         s2n_config_free(config);
     }
-
-    /* All ecc preferences are valid */
-    {
-        for (int i = 0; selection[i].version != NULL; i++) {
-            const struct s2n_ecc_preferences *preferences = selection[i].preferences;
-            for (int j = 0; j < preferences->count; j++) {
-                const struct s2n_ecc_named_curve *curve = preferences->ecc_curves[j];
-                EXPECT_NOT_NULL(curve);
-                switch(curve->iana_id) {
-                    case TLS_EC_CURVE_SECP_256_R1:
-                    EXPECT_STRING_EQUAL(curve->name, "secp256r1");
-                    EXPECT_EQUAL(curve->share_size, 65);
-                    break;
-                    case TLS_EC_CURVE_SECP_384_R1:
-                    EXPECT_STRING_EQUAL(curve->name, "secp384r1");
-                    EXPECT_EQUAL(curve->share_size, 97);
-                    break;
-                    case TLS_EC_CURVE_ECDH_X25519:
-                    EXPECT_STRING_EQUAL(curve->name, "x25519");
-                    EXPECT_EQUAL(curve->share_size, 32);
-                    break;
-                }
-            }
-        }
-    }
-
+    
     END_TEST();
-
     return 0;
 }

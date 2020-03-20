@@ -42,7 +42,9 @@ int main(int argc, char **argv)
         struct s2n_connection *conn;
 
         EXPECT_NOT_NULL(conn = s2n_connection_new(S2N_SERVER));
+        EXPECT_NOT_NULL(conn->config);
         const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
+        EXPECT_NOT_NULL(ecc_pref);
 
         EXPECT_FAILURE(s2n_extensions_server_key_share_send_check(conn));
 
@@ -63,7 +65,9 @@ int main(int argc, char **argv)
         struct s2n_connection *conn;
         EXPECT_NOT_NULL(conn = s2n_connection_new(S2N_SERVER));
         EXPECT_EQUAL(0, s2n_extensions_server_key_share_send_size(conn));
+        EXPECT_NOT_NULL(conn->config);
         const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
+        EXPECT_NOT_NULL(ecc_pref);
 
         conn->secure.server_ecc_evp_params.negotiated_curve = ecc_pref->ecc_curves[0];
         EXPECT_EQUAL(ecc_pref->ecc_curves[0]->share_size + 8, s2n_extensions_server_key_share_send_size(conn));
@@ -82,7 +86,9 @@ int main(int argc, char **argv)
         struct s2n_connection *conn;
 
         EXPECT_NOT_NULL(conn = s2n_connection_new(S2N_SERVER));
+        EXPECT_NOT_NULL(conn->config);
         const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
+        EXPECT_NOT_NULL(ecc_pref);
         struct s2n_stuffer* extension_stuffer = &conn->handshake.io;
 
         /* Error if no curve have been selected */
@@ -115,7 +121,9 @@ int main(int argc, char **argv)
 
         EXPECT_NOT_NULL(conn = s2n_connection_new(S2N_SERVER));
         struct s2n_stuffer* extension_stuffer = &conn->handshake.io;
+        EXPECT_NOT_NULL(conn->config);
         const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
+        EXPECT_NOT_NULL(ecc_pref);
         EXPECT_FAILURE(s2n_extensions_server_key_share_send(conn, extension_stuffer));
 
         conn->secure.server_ecc_evp_params.negotiated_curve = ecc_pref->ecc_curves[0];
@@ -136,16 +144,17 @@ int main(int argc, char **argv)
 
     /* Test s2n_extensions_server_key_share_recv with supported curves */
     {
-        struct s2n_connection *conn;
-        EXPECT_NOT_NULL(conn = s2n_connection_new(S2N_SERVER));
-        const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
-        EXPECT_SUCCESS(s2n_connection_free(conn));
+        const struct s2n_ecc_preferences *ecc_pref = NULL;
 
-        for (int i = 0; i < ecc_pref->count; i++) {
+        int i = 0;
+        do
+        {
             struct s2n_connection *server_send_conn;
             struct s2n_connection *client_recv_conn;
             EXPECT_NOT_NULL(server_send_conn = s2n_connection_new(S2N_SERVER));
             EXPECT_NOT_NULL(client_recv_conn = s2n_connection_new(S2N_CLIENT));
+            EXPECT_NOT_NULL(server_send_conn->config);
+            EXPECT_NOT_NULL(ecc_pref = server_send_conn->config->ecc_preferences);
 
             struct s2n_stuffer* extension_stuffer = &server_send_conn->handshake.io;
 
@@ -169,7 +178,9 @@ int main(int argc, char **argv)
 
             EXPECT_SUCCESS(s2n_connection_free(server_send_conn));
             EXPECT_SUCCESS(s2n_connection_free(client_recv_conn));
-        }
+
+            i += 1;
+        } while (i<ecc_pref->count);
     }
 
     /* Test s2n_extensions_server_key_share_recv with various sample payloads */
@@ -188,7 +199,9 @@ int main(int argc, char **argv)
                 struct s2n_connection *client_conn;
 
                 EXPECT_NOT_NULL(client_conn = s2n_connection_new(S2N_CLIENT));
+                EXPECT_NOT_NULL(client_conn->config);
                 const struct s2n_ecc_preferences *ecc_pref = client_conn->config->ecc_preferences;
+                EXPECT_NOT_NULL(ecc_pref);
                 const char *payload = key_share_payloads[i];
 
                 EXPECT_NULL(client_conn->secure.server_ecc_evp_params.negotiated_curve);
@@ -246,7 +259,9 @@ int main(int argc, char **argv)
             struct s2n_connection *client_conn;
 
             EXPECT_NOT_NULL(client_conn = s2n_connection_new(S2N_CLIENT));
+            EXPECT_NOT_NULL(client_conn->config);
             const struct s2n_ecc_preferences *ecc_pref = client_conn->config->ecc_preferences;
+            EXPECT_NOT_NULL(ecc_pref);
 
             const char *p256 = "001700410474cfd75c0ab7b57247761a277e1c92b5810dacb251bb758f43e9d15aaf292c4a2be43e886425ba55653ebb7a4f32fe368bacce3df00c618645cf1eb646f22552";
 
@@ -277,8 +292,9 @@ int main(int argc, char **argv)
 
             EXPECT_NOT_NULL(client_conn = s2n_connection_new(S2N_CLIENT));
             EXPECT_NOT_NULL(server_conn = s2n_connection_new(S2N_SERVER));
-            ecc_pref = server_conn->config->ecc_preferences;
-            notnull_check(ecc_pref);
+            EXPECT_NOT_NULL(server_conn->config);
+            EXPECT_NOT_NULL(ecc_pref = server_conn->config->ecc_preferences);
+
             
             EXPECT_SUCCESS(s2n_stuffer_growable_alloc(&client_hello_key_share, 1024));
             EXPECT_SUCCESS(s2n_stuffer_growable_alloc(&server_hello_key_share, 1024));

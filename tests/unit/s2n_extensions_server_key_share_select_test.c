@@ -36,9 +36,9 @@ int main(int argc, char **argv)
          */
         EXPECT_NOT_NULL(server_conn = s2n_connection_new(S2N_SERVER));
         EXPECT_NULL(server_conn->secure.server_ecc_evp_params.negotiated_curve);
-        notnull_check(server_conn->config);
+        EXPECT_NOT_NULL(server_conn->config);
         const struct s2n_ecc_preferences *ecc_pref = server_conn->config->ecc_preferences;
-        notnull_check(ecc_pref);
+        EXPECT_NOT_NULL(ecc_pref);
         for (int i = 0; i < ecc_pref->count; i++) {
             EXPECT_NULL(server_conn->secure.client_ecc_evp_params[i].evp_pkey);
             EXPECT_NULL(server_conn->secure.client_ecc_evp_params[i].negotiated_curve);
@@ -60,9 +60,9 @@ int main(int argc, char **argv)
          */ 
         EXPECT_NOT_NULL(server_conn = s2n_connection_new(S2N_SERVER));
         EXPECT_NULL(server_conn->secure.server_ecc_evp_params.negotiated_curve);
-        notnull_check(server_conn->config);
+        EXPECT_NOT_NULL(server_conn->config);
         const struct s2n_ecc_preferences *ecc_pref = server_conn->config->ecc_preferences;
-        notnull_check(ecc_pref);
+        EXPECT_NOT_NULL(ecc_pref);
         server_conn->secure.client_ecc_evp_params[0].negotiated_curve = ecc_pref->ecc_curves[0];
         EXPECT_SUCCESS(s2n_ecc_evp_generate_ephemeral_key(&server_conn->secure.client_ecc_evp_params[0]));
 
@@ -79,9 +79,9 @@ int main(int argc, char **argv)
          * send Hello Retry Request. 
          */ 
         EXPECT_NOT_NULL(server_conn = s2n_connection_new(S2N_SERVER));
-        notnull_check(server_conn->config);
+        EXPECT_NOT_NULL(server_conn->config);
         const struct s2n_ecc_preferences *ecc_pref = server_conn->config->ecc_preferences;
-        notnull_check(ecc_pref);
+        EXPECT_NOT_NULL(ecc_pref);
         server_conn->secure.server_ecc_evp_params.negotiated_curve = ecc_pref->ecc_curves[0];
         server_conn->secure.mutually_supported_groups[0] = ecc_pref->ecc_curves[0];
         for (int i = 0; i < ecc_pref->count; i++) {
@@ -104,9 +104,9 @@ int main(int argc, char **argv)
          */ 
         EXPECT_NOT_NULL(server_conn = s2n_connection_new(S2N_SERVER));
         EXPECT_NULL(server_conn->secure.server_ecc_evp_params.negotiated_curve);
-        notnull_check(server_conn->config);
+        EXPECT_NOT_NULL(server_conn->config);
         const struct s2n_ecc_preferences *ecc_pref = server_conn->config->ecc_preferences;
-        notnull_check(ecc_pref);
+        EXPECT_NOT_NULL(ecc_pref);
         server_conn->secure.mutually_supported_groups[0] = ecc_pref->ecc_curves[0];
         server_conn->secure.mutually_supported_groups[1] = ecc_pref->ecc_curves[1];
 
@@ -129,9 +129,9 @@ int main(int argc, char **argv)
          */
         EXPECT_NOT_NULL(server_conn = s2n_connection_new(S2N_SERVER));
         EXPECT_NULL(server_conn->secure.server_ecc_evp_params.negotiated_curve);
-        notnull_check(server_conn->config);
+        EXPECT_NOT_NULL(server_conn->config);
         const struct s2n_ecc_preferences *ecc_pref = server_conn->config->ecc_preferences;
-        notnull_check(ecc_pref);
+        EXPECT_NOT_NULL(ecc_pref);
         server_conn->secure.mutually_supported_groups[0] = ecc_pref->ecc_curves[0];
         server_conn->secure.client_ecc_evp_params[0].negotiated_curve = ecc_pref->ecc_curves[0];
         EXPECT_SUCCESS(s2n_ecc_evp_generate_ephemeral_key(&server_conn->secure.client_ecc_evp_params[0]));

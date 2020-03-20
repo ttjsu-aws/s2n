@@ -132,7 +132,7 @@ int s2n_extensions_server_key_share_recv(struct s2n_connection *conn, struct s2n
 {
     notnull_check(conn);
     notnull_check(extension);
-
+    notnull_check(conn->config);
     const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
     notnull_check(ecc_pref);
 

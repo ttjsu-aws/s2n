@@ -30,6 +30,7 @@ int s2n_extensions_client_supported_groups_send(struct s2n_connection *conn, str
     notnull_check(ecc_pref);
 
     GUARD(s2n_stuffer_write_uint16(out, TLS_EXTENSION_SUPPORTED_GROUPS));
+    /* size of extension, 2 byte iana ids */
     GUARD(s2n_stuffer_write_uint16(out, 2 + ecc_pref->count * 2));
     /* Curve list len */
     GUARD(s2n_stuffer_write_uint16(out, ecc_pref->count * 2));
@@ -65,7 +66,7 @@ int s2n_recv_client_supported_groups(struct s2n_connection *conn, struct s2n_stu
 
     GUARD(s2n_parse_client_supported_groups_list(conn, &proposed_curves, conn->secure.mutually_supported_groups));
     if (s2n_choose_supported_group(conn, conn->secure.mutually_supported_groups,
-            &conn->secure.server_ecc_evp_params) != 0) {
+            &conn->secure.server_ecc_evp_params) != S2N_SUCCESS) {
         /* Can't agree on a curve, ECC is not allowed. Return success to proceed with the handshake. */
         conn->secure.server_ecc_evp_params.negotiated_curve = NULL;
     }

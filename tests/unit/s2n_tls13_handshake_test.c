@@ -282,7 +282,9 @@ int main(int argc, char **argv)
             for (int i = 0; i < S2N_MAX_HANDSHAKE_LENGTH; i++) {
                 struct s2n_connection *conn;
                 EXPECT_NOT_NULL(conn = s2n_connection_new(modes[m]));
+                EXPECT_NOT_NULL(conn->config);
                 const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
+                EXPECT_NOT_NULL(ecc_pref);
 
                 conn->actual_protocol_version = S2N_TLS13;
                 conn->secure.cipher_suite = &s2n_tls13_aes_128_gcm_sha256;
@@ -330,7 +332,9 @@ int main(int argc, char **argv)
             for (int i = 0; i < S2N_MAX_HANDSHAKE_LENGTH; i++) {
                 struct s2n_connection *conn;
                 EXPECT_NOT_NULL(conn = s2n_connection_new(modes[m]));
+                EXPECT_NOT_NULL(conn->config);
                 const struct s2n_ecc_preferences *ecc_pref = conn->config->ecc_preferences;
+                EXPECT_NOT_NULL(ecc_pref);
 
                 conn->actual_protocol_version = S2N_TLS12;
                 conn->secure.cipher_suite = &s2n_tls13_aes_128_gcm_sha256;

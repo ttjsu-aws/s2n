@@ -85,7 +85,9 @@ int main(int argc, char **argv)
         struct s2n_connection *conn;
         EXPECT_NOT_NULL(conn = s2n_connection_new(S2N_SERVER));
         EXPECT_SUCCESS(s2n_connection_set_config(conn, config));
+        EXPECT_NOT_NULL(conn->config);
         const struct s2n_ecc_preferences *ecc_preferences = config->ecc_preferences;
+        EXPECT_NOT_NULL(ecc_preferences);
         /* configure these parameters so server hello can be sent */
         conn->actual_protocol_version = S2N_TLS13;
         conn->secure.server_ecc_evp_params.negotiated_curve = ecc_preferences->ecc_curves[0];

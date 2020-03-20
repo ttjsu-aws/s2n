@@ -53,6 +53,7 @@ int s2n_tls13_keys_from_conn(struct s2n_tls13_keys *keys, struct s2n_connection 
 
 int s2n_tls13_compute_shared_secret(struct s2n_connection *conn, struct s2n_blob *shared_secret)
 {
+    notnull_check(conn->config);
     const struct s2n_ecc_preferences *ecc_preferences = conn->config->ecc_preferences;
     notnull_check(ecc_preferences);
     struct s2n_ecc_evp_params *server_key = &conn->secure.server_ecc_evp_params;
@@ -89,7 +90,10 @@ int s2n_tls13_compute_shared_secret(struct s2n_connection *conn, struct s2n_blob
  */
 int s2n_tls13_handle_handshake_secrets(struct s2n_connection *conn)
 {
+    notnull_check(conn->config);
     const struct s2n_ecc_preferences *ecc_preferences = conn->config->ecc_preferences;
+    notnull_check(ecc_preferences);
+    
     /* get tls13 key context */
     s2n_tls13_connection_keys(secrets, conn);
 
