@@ -49,10 +49,6 @@ int main(int argc, char **argv)
         for (int i = 0; i < ecc_pref->count; i++) {
             EXPECT_NULL(server_conn->secure.mutually_supported_groups[i]);
         }
-        uint8_t data[2];
-        EXPECT_SUCCESS(s2n_blob_init(&iana_ids, data, sizeof(data)));
-        EXPECT_SUCCESS(s2n_stuffer_init(&out, &iana_ids));
-        EXPECT_SUCCESS(s2n_stuffer_write_uint16(&out, ecc_pref->ecc_curves[0]->iana_id));
 
         EXPECT_SUCCESS(s2n_parse_client_supported_groups_list(server_conn, &iana_ids, server_conn->secure.mutually_supported_groups));
 

@@ -117,8 +117,45 @@ ALL_CIPHERS_PER_LIBCRYPTO_VERSION = {
     "boringssl"             : LEGACY_COMPATIBLE_CIPHERS,
 }
 
+class Curve():
+    def __init__(self, name, min_version):
+        self.name = name
+        self.min_version = min_version
 
-ALL_CURVES = ["P-256", "P-384"]
+    def valid_for(self, version):
+        if not version:
+            version = Version.default()
+
+        if version.value < self.min_version.value:
+            return False
+        if self.min_version is Version.TLS13:
+            return version.value >= Version.TLS13.value
+        return True
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def all(cls):
+        return ALL_CURVES_PER_LIBCRYPTO_VERSION[get_libcrypto()]
+
+ALL_CURVES = [
+    Curve("P-256", Version.SSLv3),
+    Curve("P-384", Version.SSLv3),
+    Curve("X25519", Version.TLS13)
+]
+
+# Older versions of Openssl, do not support X25519. Current versions of LibreSSL and BoringSSL use a different API
+# that is unsupported by s2n.
+LEGACY_COMPATIBLE_CURVES = list(filter(lambda x: "X25519" not in x.name, ALL_CURVES))
+
+ALL_CURVES_PER_LIBCRYPTO_VERSION = {
+    "openssl-1.1.1"         : ALL_CURVES,
+    "openssl-1.0.2"         : LEGACY_COMPATIBLE_CURVES,
+    "openssl-1.0.2-fips"    : LEGACY_COMPATIBLE_CURVES,
+    "libressl"              : LEGACY_COMPATIBLE_CURVES,
+    "boringssl"             : LEGACY_COMPATIBLE_CURVES,
+}
 
 
 class Scenario:
@@ -128,7 +165,7 @@ class Scenario:
 
     """
 
-    def __init__(self, s2n_mode, host, port, version=None, cipher=None, curve=None,
+    def __init__(self, s2n_mode, host, port, version=None, cipher=None, curve=ALL_CURVES[0],
                  cert=ALL_CERTS[0], s2n_flags=[], peer_flags=[]):
         """
         Args:
@@ -195,13 +232,16 @@ def run_scenarios(test_func, scenarios):
 
 
 def get_scenarios(host, start_port, s2n_modes=Mode.all(), versions=[None], ciphers=[None],
-                  curves=ALL_CURVES, certs=ALL_CERTS, s2n_flags=[], peer_flags=[]):
+                  curves=[None], certs=ALL_CERTS, s2n_flags=[], peer_flags=[]):
     port = start_port
     scenarios = []
 
     combos = itertools.product(versions, s2n_modes, ciphers, curves, certs)
     for (version, s2n_mode, cipher, curve, cert) in combos:
         if cipher and not cipher.valid_for(version):
+            continue
+
+        if curve and not curve.valid_for(version):
             continue
 
         for s2n_mode in s2n_modes:

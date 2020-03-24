@@ -462,7 +462,6 @@ def main():
     test_ciphers = S2N_LIBCRYPTO_TO_TEST_CIPHERS[args.libcrypto]
     host = args.host
     port = args.port
-    libcrypto_version = args.libcrypto
 
     fips_mode = False
     if environ.get("S2N_TEST_IN_FIPS_MODE") is not None:
@@ -477,7 +476,7 @@ def main():
     failed += client_auth_test(host, port, test_ciphers, fips_mode)
     failed += sigalg_test(host, port, fips_mode)
     failed += sigalg_test(host, port, fips_mode, use_client_auth=True)
-    failed += elliptic_curve_test(host, port, libcrypto_version, fips_mode)
+    failed += elliptic_curve_test(host, port, fips_mode)
     failed += elliptic_curve_fallback_test(host, port, fips_mode)
     failed += handshake_fragmentation_test(host, port, fips_mode)
     failed += ocsp_stapling_test(host, port, fips_mode)
