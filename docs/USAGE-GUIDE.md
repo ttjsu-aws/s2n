@@ -1067,6 +1067,15 @@ int s2n_connection_set_cipher_preferences(struct s2n_connection *conn, const cha
 s2n_connection. Calling this function is not necessary unless you want to set the
 cipher preferences on the connection to something different than what is in the s2n_config.
 
+### s2n\_connection\_set\_curve\_preferences
+
+```c
+int s2n_connection_set_curve_preferences(struct s2n_connection *conn, const char *version);
+```
+
+**s2n_connection_set_curve_preferences** sets the curve preference override for the
+s2n_connection. Calling this function is not necessary unless you want to set the
+cipher preferences on the connection to something different than what is in the s2n_config.
 
 ### s2n\_connection\_set\_protocol\_preferences
 

@@ -26,9 +26,9 @@ const struct s2n_ecc_named_curve *const s2n_ecc_pref_list_20140601[] = {
 };
 
 const struct s2n_ecc_named_curve *const s2n_ecc_pref_list_20200310[] = {
+    &s2n_ecc_curve_x25519,
     &s2n_ecc_curve_secp256r1,
     &s2n_ecc_curve_secp384r1,
-    &s2n_ecc_curve_x25519,
 };
 
 const struct s2n_ecc_preferences s2n_ecc_preferences_20140601 = {
@@ -70,5 +70,11 @@ static int s2n_find_ecc_pref_from_version(const char *version, const struct s2n_
 int s2n_config_set_ecc_preferences(struct s2n_config *config, const char *version)
 {
     GUARD(s2n_find_ecc_pref_from_version(version, &config->ecc_preferences));
+    return 0;
+}
+
+int s2n_connection_set_ecc_preferences(struct s2n_connection *conn, const char *version)
+{
+    GUARD(s2n_find_cipher_pref_from_version(version, &conn->cipher_pref_override));
     return 0;
 }
