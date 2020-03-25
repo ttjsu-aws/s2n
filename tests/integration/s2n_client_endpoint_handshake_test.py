@@ -36,8 +36,8 @@ well_known_endpoints = [
     {"endpoint": "twitter.com"},
     {"endpoint": "wikipedia.org"},
     {"endpoint": "yahoo.com"},
-    {"endpoint": "kms.us-east-1.amazonaws.com", "cipher_preference_version": "KMS-PQ-TLS-1-0-2019-06", "expected_cipher": "ECDHE-BIKE-RSA-AES256-GCM-SHA384", "curve_preference_version":"20200310"},
-    {"endpoint": "kms.us-east-1.amazonaws.com", "cipher_preference_version": "PQ-SIKE-TEST-TLS-1-0-2019-11", "expected_cipher": "ECDHE-SIKE-RSA-AES256-GCM-SHA384",  "curve_preference_version":"20200310"}
+    {"endpoint": "kms.us-east-1.amazonaws.com", "cipher_preference_version": "KMS-PQ-TLS-1-0-2019-06", "expected_cipher": "ECDHE-BIKE-RSA-AES256-GCM-SHA384"},
+    {"endpoint": "kms.us-east-1.amazonaws.com", "cipher_preference_version": "PQ-SIKE-TEST-TLS-1-0-2019-11", "expected_cipher": "ECDHE-SIKE-RSA-AES256-GCM-SHA384"}
 ]
 
 # Make an exception to allow failure (if CI is having issues)
@@ -89,7 +89,7 @@ def well_known_endpoints_test(use_corked_io, tls13_enabled):
     opt_list = []
 
     if tls13_enabled:
-        arguments += ["--tls13", "--ciphers", "default_tls13", "--curves", "default_tls13"]
+        arguments += ["--tls13", "--ciphers", "default_tls13"]
         opt_list += ["TLS 1.3"]
     if use_corked_io:
         arguments += ["-C"]
@@ -113,9 +113,6 @@ def well_known_endpoints_test(use_corked_io, tls13_enabled):
 
         if "cipher_preference_version" in endpoint_config:
             arguments += ["-c", endpoint_config["cipher_preference_version"]]
-
-        if "curve_preference_version" in endpoint_config:
-            arguments += ["--curves", endpoint_config["curve_preference_version"]]
 
         # Retry handshake in case there are any problems going over the internet
         for i in range(1, maxRetries):

@@ -28,9 +28,7 @@ const struct s2n_ecc_named_curve *const s2n_ecc_pref_list_20140601[] = {
 const struct s2n_ecc_named_curve *const s2n_ecc_pref_list_20200310[] = {
     &s2n_ecc_curve_secp256r1,
     &s2n_ecc_curve_secp384r1,
-#if MODERN_EC_SUPPORTED
     &s2n_ecc_curve_x25519,
-#endif
 };
 
 const struct s2n_ecc_preferences s2n_ecc_preferences_20140601 = {

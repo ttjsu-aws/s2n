@@ -60,6 +60,8 @@ const struct s2n_ecc_named_curve s2n_ecc_curve_x25519 = {
     .name = "x25519", 
     .share_size = 32
 };
+#else 
+const struct s2n_ecc_named_curve s2n_ecc_curve_x25519 = {0};
 #endif
 
 const struct s2n_ecc_named_curve *const s2n_supported_curves_list[] = {
@@ -71,6 +73,12 @@ const struct s2n_ecc_named_curve *const s2n_supported_curves_list[] = {
 };
 
 const size_t s2n_supported_curves_list_len = s2n_array_len(s2n_supported_curves_list);
+
+
+int s2n_is_modern_ec_supported()
+{
+    return MODERN_EC_SUPPORTED;
+}
 
 #if MODERN_EC_SUPPORTED
 static int s2n_ecc_evp_generate_key_x25519(const struct s2n_ecc_named_curve *named_curve, EVP_PKEY **evp_pkey);

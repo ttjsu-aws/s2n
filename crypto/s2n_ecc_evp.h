@@ -34,6 +34,7 @@ struct s2n_ecc_named_curve {
 
 extern const struct s2n_ecc_named_curve s2n_ecc_curve_secp256r1;
 extern const struct s2n_ecc_named_curve s2n_ecc_curve_secp384r1;
+extern const struct s2n_ecc_named_curve s2n_ecc_curve_x25519;
 
 /* BoringSSL only supports using EVP_PKEY_X25519 with "modern" EC EVP APIs. BoringSSL has a note to possibly add this in
  * the future. See https://github.com/google/boringssl/blob/master/crypto/evp/p_x25519_asn1.c#L233
@@ -41,7 +42,6 @@ extern const struct s2n_ecc_named_curve s2n_ecc_curve_secp384r1;
 #if S2N_OPENSSL_VERSION_AT_LEAST(1, 1, 0) && !defined(LIBRESSL_VERSION_NUMBER) && !defined(OPENSSL_IS_BORINGSSL)
     #define MODERN_EC_SUPPORTED 1
     #define S2N_ECC_EVP_SUPPORTED_CURVES_COUNT 3
-    extern const struct s2n_ecc_named_curve s2n_ecc_curve_x25519;
 #else
     #define MODERN_EC_SUPPORTED 0
     #define S2N_ECC_EVP_SUPPORTED_CURVES_COUNT 2
@@ -77,3 +77,4 @@ int s2n_ecc_evp_parse_params(struct s2n_ecdhe_raw_server_params *raw_server_ecc_
                              struct s2n_ecc_evp_params *ecc_evp_params);
 int s2n_ecc_evp_find_supported_curve(struct s2n_blob *iana_ids, const struct s2n_ecc_named_curve **found);
 int s2n_ecc_evp_params_free(struct s2n_ecc_evp_params *ecc_evp_params);
+int s2n_is_modern_ec_supported();
