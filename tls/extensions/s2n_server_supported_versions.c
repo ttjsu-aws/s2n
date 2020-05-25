@@ -43,7 +43,7 @@ static int s2n_server_supported_versions_recv(struct s2n_connection *conn, struc
 
 const s2n_extension_type s2n_server_supported_versions_extension = {
     .iana_value = TLS_EXTENSION_SUPPORTED_VERSIONS,
-    .is_response = true,
+    .is_response = false,
     .send = s2n_server_supported_versions_send,
     .recv = s2n_server_supported_versions_recv,
     .should_send = s2n_extension_send_if_tls13_connection,

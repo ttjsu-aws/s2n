@@ -97,6 +97,7 @@ extern const struct s2n_security_policy security_policy_kms_fips_tls_1_2_2018_10
 extern const struct s2n_security_policy security_policy_20190120;
 extern const struct s2n_security_policy security_policy_20190121;
 extern const struct s2n_security_policy security_policy_20190122;
+extern const struct s2n_security_policy security_policy_20200518;
 
 extern const struct s2n_security_policy security_policy_null;
 

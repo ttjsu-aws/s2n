@@ -68,5 +68,34 @@ int s2n_server_hello_retry_send(struct s2n_connection *conn)
 
 int s2n_server_hello_retry_recv(struct s2n_connection *conn)
 {
-    S2N_ERROR(S2N_ERR_BAD_MESSAGE);
+    notnull_check(conn);
+
+    /* If the client receives a second HelloRetryRequest in the same connection, 
+    it MUST abort handshake. */
+    if (conn->handshake.client_hrr_received) {
+        S2N_ERROR(S2N_ERR_BAD_MESSAGE);
+    }
+    conn->handshake.client_hrr_received = 1;
+
+     const struct s2n_ecc_named_curve *named_curve = conn->secure.server_ecc_evp_params.negotiated_curve;
+    const struct s2n_ecc_preferences *ecc_pref = NULL;
+    GUARD(s2n_connection_get_ecc_preferences(conn, &ecc_pref));
+    notnull_check(ecc_pref);
+
+    /* Upon receipt of the HelloRetryRequest, the client MUST verify that:
+     * (1) the selected_group field corresponds to a group
+     * which was provided in the "supported_groups" extension in the
+     * original ClientHello and
+     * (2) the selected_group field does not correspond to a group which was provided
+     * in the "key_share" extension in the original ClientHello.
+     * If either of these checks fails, then the client MUST abort the handshake.
+     * */
+
+    for (int i = 0; i < ecc_pref->count; i++) {
+        if (named_curve == conn->secure.client_ecc_evp_params[i].negotiated_curve
+                        && conn->secure.client_ecc_evp_params[i].evp_pkey != NULL) {
+            S2N_ERROR(S2N_ERR_BAD_MESSAGE);
+        }
+    }
+    return S2N_SUCCESS;
 }

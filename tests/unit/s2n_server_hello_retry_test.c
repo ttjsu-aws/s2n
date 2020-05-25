@@ -111,8 +111,8 @@ int main(int argc, char **argv)
         /* Copy server stuffer to client stuffer */
         EXPECT_SUCCESS(s2n_stuffer_copy(&server_conn->handshake.io, &client_conn->handshake.io, total));
 
-        /* Test that s2n_server_hello_retry_recv() is unsupported */
-        EXPECT_FAILURE_WITH_ERRNO(s2n_server_hello_retry_recv(client_conn), S2N_ERR_BAD_MESSAGE);
+        EXPECT_SUCCESS(s2n_set_hello_retry_required(client_conn));
+        EXPECT_SUCCESS(s2n_server_hello_recv(client_conn));
 
         EXPECT_SUCCESS(s2n_config_free(client_config));
         EXPECT_SUCCESS(s2n_config_free(server_config));
@@ -259,9 +259,6 @@ int main(int argc, char **argv)
         /* Parse the key share */
         EXPECT_SUCCESS(s2n_extensions_server_key_share_recv(client_conn, extension_stuffer));
         EXPECT_EQUAL(s2n_stuffer_data_available(extension_stuffer), 0);
-
-        /* This curve will be NULL even though the extension succeeded */
-        EXPECT_NULL(client_conn->secure.server_ecc_evp_params.negotiated_curve);
 
         EXPECT_SUCCESS(s2n_connection_free(server_conn));
         EXPECT_SUCCESS(s2n_connection_free(client_conn));

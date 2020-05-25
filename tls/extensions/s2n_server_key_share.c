@@ -22,6 +22,24 @@
 #include "utils/s2n_safety.h"
 #include "tls/s2n_tls13.h"
 
+
+/* from RFC: https://tools.ietf.org/html/rfc8446#section-4.1.3*/
+uint8_t server_hrr_random[S2N_TLS_RANDOM_DATA_LEN] = {
+    0xCF, 0x21, 0xAD, 0x74, 0xE5, 0x9A, 0x61, 0x11, 0xBE, 0x1D, 0x8C, 0x02, 0x1E, 0x65, 0xB8, 0x91,
+    0xC2, 0xA2, 0x11, 0x16, 0x7A, 0xBB, 0x8C, 0x5E, 0x07, 0x9E, 0x09, 0xE2, 0xC8, 0xA8, 0x33, 0x9C
+};
+
+/* Lets the client determine whether the ClientHello is a responde to a HelloRetryRequest*/
+static bool s2n_server_hello_is_hrr(struct s2n_connection *conn)
+{
+    notnull_check(conn);
+
+    bool has_correct_random = (memcmp(server_hrr_random, conn->secure.server_random, S2N_TLS_RANDOM_DATA_LEN) == 0);
+
+    return has_correct_random;
+}
+
+
 static int s2n_server_key_share_send(struct s2n_connection *conn, struct s2n_stuffer *out);
 static int s2n_server_key_share_recv(struct s2n_connection *conn, struct s2n_stuffer *extension);
 
@@ -94,8 +112,10 @@ static int s2n_server_key_share_recv(struct s2n_connection *conn, struct s2n_stu
     S2N_ERROR_IF(supported_curve_index < 0, S2N_ERR_ECDHE_UNSUPPORTED_CURVE);
 
     /* If this is a HelloRetryRequest, we won't have a key share. We just have the selected group.
-     * Exit early so a proper keyshare can be generated. */
-    if (s2n_is_hello_retry_required(conn)) {
+     * Set the server negotiated curve and exit early so a proper keyshare can be generated. */
+    if (s2n_server_hello_is_hrr(conn)) {
+        struct s2n_ecc_evp_params* server_ecc_evp_params = &conn->secure.server_ecc_evp_params;
+        server_ecc_evp_params->negotiated_curve = ecc_pref->ecc_curves[supported_curve_index];
         return 0;
     }
 
