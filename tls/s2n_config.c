@@ -137,7 +137,7 @@ static int s2n_config_init(struct s2n_config *config)
     s2n_x509_trust_store_init_empty(&config->trust_store);
     s2n_x509_trust_store_from_system_defaults(&config->trust_store);
 
-    return 0;
+    return 0; 
 }
 
 static int s2n_config_cleanup(struct s2n_config *config)
@@ -149,8 +149,7 @@ static int s2n_config_cleanup(struct s2n_config *config)
     GUARD(s2n_config_free_cert_chain_and_key(config));
     GUARD(s2n_config_free_dhparams(config));
     GUARD(s2n_free(&config->application_protocols));
-    GUARD_AS_POSIX(s2n_map_free(config->domain_name_to_cert_map));
-
+    GUARD_AS_POSIX(s2n_map_free(config->domain_name_to_cert_map)); 
     return 0;
 }
 
@@ -238,7 +237,7 @@ struct s2n_config *s2n_fetch_default_config(void)
 
 int s2n_config_set_unsafe_for_testing(struct s2n_config *config)
 {
-    S2N_ERROR_IF(!S2N_IN_TEST, S2N_ERR_NOT_IN_UNIT_TEST);
+    S2N_ERROR_IF(!S2N_IN_TEST, S2N_ERR_NOT_IN_TEST);
     config->client_cert_auth_type = S2N_CERT_AUTH_NONE;
     config->check_ocsp = 0;
     config->disable_x509_validation = 1;

@@ -43,7 +43,7 @@ static int s2n_server_key_share_send(struct s2n_connection *conn, struct s2n_stu
 
     /* Retry requests only require the selected named group, not an actual share.
      * https://tools.ietf.org/html/rfc8446#section-4.2.8 */
-    if (s2n_is_hello_retry_required(conn)) {
+    if (s2n_is_hello_retry_message(conn)) {
         notnull_check(conn->secure.server_ecc_evp_params.negotiated_curve);
 
         /* There was a mutually supported group, so that is the group we will select */
@@ -52,6 +52,7 @@ static int s2n_server_key_share_send(struct s2n_connection *conn, struct s2n_stu
         return 0;
     }
 
+    conn->secure.server_ecc_evp_params.evp_pkey = NULL;
     GUARD(s2n_ecdhe_parameters_send(&conn->secure.server_ecc_evp_params, out));
 
     return S2N_SUCCESS;
@@ -93,8 +94,10 @@ static int s2n_server_key_share_recv(struct s2n_connection *conn, struct s2n_stu
     S2N_ERROR_IF(supported_curve_index < 0, S2N_ERR_ECDHE_UNSUPPORTED_CURVE);
 
     /* If this is a HelloRetryRequest, we won't have a key share. We just have the selected group.
-     * Exit early so a proper keyshare can be generated. */
-    if (s2n_is_hello_retry_required(conn)) {
+     * Set the server negotiated curve and exit early so a proper keyshare can be generated. */
+    if (s2n_is_hello_retry_handshake(conn)) {
+        struct s2n_ecc_evp_params* server_ecc_evp_params = &conn->secure.server_ecc_evp_params;
+        server_ecc_evp_params->negotiated_curve = ecc_pref->ecc_curves[supported_curve_index];
         return 0;
     }
 
@@ -127,7 +130,7 @@ int s2n_extensions_server_key_share_send_check(struct s2n_connection *conn)
     /* If we are responding to a retry request then we don't have a valid
      * curve from the client. Just return 0 so a selected group will be
      * chosen for the key share. */
-    if (s2n_is_hello_retry_required(conn)) {
+    if (s2n_is_hello_retry_message(conn)) {
         return 0;
     }
 
@@ -170,7 +173,7 @@ int s2n_extensions_server_key_share_select(struct s2n_connection *conn)
     GUARD(s2n_connection_get_ecc_preferences(conn, &ecc_pref));
     notnull_check(ecc_pref);
 
-    for (uint32_t i = 0; i < ecc_pref->count; i++) {
+    for (int i = 0; i < ecc_pref->count; i++) {
         /* Checks supported group and keyshare have both been sent */
         if (conn->secure.client_ecc_evp_params[i].negotiated_curve &&
                 conn->secure.mutually_supported_groups[i]) {
@@ -181,7 +184,7 @@ int s2n_extensions_server_key_share_select(struct s2n_connection *conn)
 
     /* Client sent no keyshares, need to send Hello Retry Request with first negotiated curve */
     if (conn->secure.server_ecc_evp_params.negotiated_curve) {
-        GUARD(s2n_set_hello_retry_required(conn));
+        GUARD(s2n_set_hello_retry_handshake(conn));
         return 0;
     }
 
@@ -207,7 +210,7 @@ int s2n_extensions_server_key_share_send_size(struct s2n_connection *conn)
         + S2N_SIZE_OF_NAMED_GROUP;
 
     /* If this is a KeyShareHelloRetryRequest we don't include the share size */
-    if (s2n_is_hello_retry_required(conn)) {
+    if (s2n_is_hello_retry_handshake(conn)) {
         return key_share_size;
     }
 

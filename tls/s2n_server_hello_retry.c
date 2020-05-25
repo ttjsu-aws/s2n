@@ -39,6 +39,14 @@ static int s2n_conn_reset_retry_values(struct s2n_connection *conn)
     /* Reset handshake values */
     conn->handshake.client_hello_received = 0;
 
+    const struct s2n_ecc_preferences *ecc_prefs = NULL;
+    GUARD(s2n_connection_get_ecc_preferences(conn, &ecc_prefs));
+    notnull_check(ecc_prefs);
+
+    for (int i=0; i<ecc_prefs->count; i++) {
+        GUARD(s2n_ecc_evp_params_free(&conn->secure.client_ecc_evp_params[i]));
+    }
+
     /* Reset client hello state */
     GUARD(s2n_stuffer_wipe(&conn->client_hello.raw_message));
     GUARD(s2n_stuffer_resize(&conn->client_hello.raw_message, 0));
@@ -51,6 +59,7 @@ static int s2n_conn_reset_retry_values(struct s2n_connection *conn)
 int s2n_server_hello_retry_send(struct s2n_connection *conn)
 {
     notnull_check(conn);
+    GUARD(s2n_ecc_evp_params_free(&conn->secure.server_ecc_evp_params));
 
     memcpy_check(conn->secure.server_random, hello_retry_req_random, S2N_TLS_RANDOM_DATA_LEN);
 
@@ -68,5 +77,27 @@ int s2n_server_hello_retry_send(struct s2n_connection *conn)
 
 int s2n_server_hello_retry_recv(struct s2n_connection *conn)
 {
-    S2N_ERROR(S2N_ERR_BAD_MESSAGE);
+    notnull_check(conn);
+
+    const struct s2n_ecc_named_curve *named_curve = conn->secure.server_ecc_evp_params.negotiated_curve;
+    const struct s2n_ecc_preferences *ecc_pref = NULL;
+    GUARD(s2n_connection_get_ecc_preferences(conn, &ecc_pref));
+    notnull_check(ecc_pref);
+
+    /* Upon receipt of the HelloRetryRequest, the client MUST verify that:
+     * (1) the selected_group field corresponds to a group
+     * which was provided in the "supported_groups" extension in the
+     * original ClientHello and
+     * (2) the selected_group field does not correspond to a group which was provided
+     * in the "key_share" extension in the original ClientHello.
+     * If either of these checks fails, then the client MUST abort the handshake.
+     * */
+
+    for (int i = 0; i < ecc_pref->count; i++) {
+        if (named_curve == conn->secure.client_ecc_evp_params[i].negotiated_curve
+                        && conn->secure.client_ecc_evp_params[i].evp_pkey != NULL) {
+            S2N_ERROR(S2N_ERR_BAD_MESSAGE);
+        }
+    }
+    return S2N_SUCCESS;
 }

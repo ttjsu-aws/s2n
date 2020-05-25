@@ -18,6 +18,8 @@
 #include "tls/s2n_connection.h"
 #include "stuffer/s2n_stuffer.h"
 
+#include "tls/extensions/s2n_key_share.h"
+
 extern const s2n_extension_type s2n_client_key_share_extension;
 
 /* Old-style extension functions -- remove after extensions refactor is complete */

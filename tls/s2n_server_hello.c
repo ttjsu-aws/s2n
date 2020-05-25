@@ -50,6 +50,13 @@ const uint8_t tls11_downgrade_protection_bytes[] = {
     0x44, 0x4F, 0x57, 0x4E, 0x47, 0x52, 0x44, 0x00
 };
 
+static bool s2n_check_server_random_hrr(struct s2n_connection *conn)
+{
+    notnull_check(conn);
+    bool has_hrr_random = (memcmp(hello_retry_req_random, conn->secure.server_random, S2N_TLS_RANDOM_DATA_LEN) == 0);
+    return has_hrr_random;
+}
+
 static int s2n_client_detect_downgrade_mechanism(struct s2n_connection *conn) {
     if (!s2n_is_tls13_enabled()) {
         return 0;
@@ -104,6 +111,13 @@ static int s2n_server_hello_parse(struct s2n_connection *conn)
 
     GUARD(s2n_stuffer_read_bytes(in, protocol_version, S2N_TLS_PROTOCOL_VERSION_LEN));
     GUARD(s2n_stuffer_read_bytes(in, conn->secure.server_random, S2N_TLS_RANDOM_DATA_LEN));
+
+    if (s2n_check_server_random_hrr(conn)) {
+        if (conn->handshake.handshake_type & HELLO_RETRY_REQUEST) {
+            S2N_ERROR(S2N_ERR_BAD_MESSAGE);
+        }
+        GUARD(s2n_set_hello_retry_handshake(conn));
+    }
 
     GUARD(s2n_stuffer_read_uint8(in, &session_id_len));
     S2N_ERROR_IF(session_id_len > S2N_TLS_SESSION_ID_MAX_LEN, S2N_ERR_BAD_MESSAGE);
@@ -230,7 +244,7 @@ int s2n_server_hello_write_message(struct s2n_connection *conn)
 int s2n_server_hello_send(struct s2n_connection *conn)
 {
     notnull_check(conn);
-
+    
     struct s2n_stuffer server_random = {0};
     struct s2n_blob b = {0};
     GUARD(s2n_blob_init(&b, conn->secure.server_random, S2N_TLS_RANDOM_DATA_LEN));
