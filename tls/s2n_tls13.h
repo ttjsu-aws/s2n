@@ -29,3 +29,4 @@ bool s2n_is_valid_tls13_cipher(const uint8_t version[2]);
 bool s2n_is_hello_retry_required(struct s2n_connection *conn);
 bool s2n_is_hello_retry_handshake(struct s2n_connection *conn);
 int s2n_set_hello_retry_required(struct s2n_connection *conn);
+bool s2n_server_hello_is_hrr(struct s2n_connection *conn);

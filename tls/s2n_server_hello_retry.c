@@ -32,6 +32,12 @@ uint8_t hello_retry_req_random[S2N_TLS_RANDOM_DATA_LEN] = {
     0xC2, 0xA2, 0x11, 0x16, 0x7A, 0xBB, 0x8C, 0x5E, 0x07, 0x9E, 0x09, 0xE2, 0xC8, 0xA8, 0x33, 0x9C
 };
 
+bool s2n_server_hello_is_hrr(struct s2n_connection *conn)
+{
+    notnull_check(conn);
+    return (memcmp(hello_retry_req_random, conn->secure.server_random, S2N_TLS_RANDOM_DATA_LEN) == 0);
+}
+
 static int s2n_conn_reset_retry_values(struct s2n_connection *conn)
 {
     notnull_check(conn);
@@ -77,7 +83,7 @@ int s2n_server_hello_retry_recv(struct s2n_connection *conn)
     }
     conn->handshake.client_hrr_received = 1;
 
-     const struct s2n_ecc_named_curve *named_curve = conn->secure.server_ecc_evp_params.negotiated_curve;
+    const struct s2n_ecc_named_curve *named_curve = conn->secure.server_ecc_evp_params.negotiated_curve;
     const struct s2n_ecc_preferences *ecc_pref = NULL;
     GUARD(s2n_connection_get_ecc_preferences(conn, &ecc_pref));
     notnull_check(ecc_pref);

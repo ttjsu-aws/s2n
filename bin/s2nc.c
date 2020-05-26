@@ -392,7 +392,7 @@ int main(int argc, char *const *argv)
         struct s2n_config *config = s2n_config_new();
         setup_s2n_config(config, cipher_prefs, type, &unsafe_verify_data, host, alpn_protocols, mfl_value);
         if (keyshare != 0) {
-            s2n_config_add_keyshare_by_group(config, keyshare);
+            s2n_config_add_keyshare_by_group_for_testing(config, keyshare);
         }
 
         if (ca_file || ca_dir) {

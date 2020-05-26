@@ -1307,39 +1307,3 @@ uint8_t s2n_connection_get_protocol_version(const struct s2n_connection *conn)
     return conn->server_protocol_version;
 }
 
-int s2n_connection_add_preferred_key_share_by_curve_name(struct s2n_connection *conn, const char *curve_name)
-{
-    for (int i = 0; i < s2n_all_supported_curves_list_len; i++) {
-        if (!strcasecmp(curve_name, s2n_all_supported_curves_list[i]->name)) {
-            memcpy_check(&conn->secure.client_ecc_evp_params[i], s2n_all_supported_curves_list[i], sizeof(struct s2n_ecc_named_curve));
-            GUARD(s2n_ecc_evp_generate_ephemeral_key(&conn->secure.client_ecc_evp_params[i]));
-            return 0;
-        }
-    }
-
-    S2N_ERROR(S2N_ERR_INVALID_CIPHER_PREFERENCES);
-}
-
-int s2n_connection_add_preferred_key_share_by_group(struct s2n_connection *conn, uint16_t iana_id)
-{
-    for (int i = 0; i < s2n_all_supported_curves_list_len; i++) {
-        if (s2n_all_supported_curves_list[i]->iana_id == iana_id) {
-            memcpy_check(&conn->secure.client_ecc_evp_params[i], s2n_all_supported_curves_list[i], sizeof(struct s2n_ecc_named_curve));
-            GUARD(s2n_ecc_evp_generate_ephemeral_key(&conn->secure.client_ecc_evp_params[i]));
-            return 0;
-        }
-    }
-
-    S2N_ERROR(S2N_ERR_INVALID_CIPHER_PREFERENCES);
-}
-
-int s2n_connection_clear_all_key_shares(struct s2n_connection *conn)
-{
-    for (int i = 0; i < s2n_all_supported_curves_list_len; i++) {
-        GUARD(s2n_ecc_evp_params_free(&conn->secure.client_ecc_evp_params[i]));
-        conn->secure.client_ecc_evp_params[i].negotiated_curve = NULL;
-    }
-
-    return 0;
-}
-

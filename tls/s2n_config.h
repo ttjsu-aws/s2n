@@ -111,7 +111,7 @@ void s2n_wipe_static_configs(void);
 extern struct s2n_cert_chain_and_key *s2n_config_get_single_default_cert(struct s2n_config *config);
 int s2n_config_get_num_default_certs(struct s2n_config *config);
 
-int s2n_config_clear_all_curves(struct s2n_config *conf);
-int s2n_config_add_keyshare_by_group(struct s2n_config *conf, uint16_t iana_id);
-int s2n_config_send_empty_keyshare(struct s2n_config *conf);
-int s2n_config_add_all_curves(struct s2n_config *conf);
+int s2n_config_clear_all_curves_for_testing(struct s2n_config *config);
+int s2n_config_add_keyshare_by_group_for_testing(struct s2n_config *config, uint16_t iana_id);
+int s2n_config_send_empty_keyshare_for_testing(struct s2n_config *config);
+int s2n_config_add_all_curves_for_testing(struct s2n_config *config);

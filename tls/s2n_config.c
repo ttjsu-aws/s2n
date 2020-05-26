@@ -240,7 +240,7 @@ struct s2n_config *s2n_fetch_default_config(void)
 
 int s2n_config_set_unsafe_for_testing(struct s2n_config *config)
 {
-    S2N_ERROR_IF(!S2N_IN_TEST, S2N_ERR_NOT_IN_UNIT_TEST);
+    S2N_ERROR_IF(!S2N_IN_TEST, S2N_ERR_NOT_IN_TEST);
     config->client_cert_auth_type = S2N_CERT_AUTH_NONE;
     config->check_ocsp = 0;
     config->disable_x509_validation = 1;
@@ -829,20 +829,23 @@ int s2n_config_get_num_default_certs(struct s2n_config *config)
     return num_certs;
 }
 
-int s2n_config_clear_all_curves(struct s2n_config *conf)
+int s2n_config_clear_all_curves_for_testing(struct s2n_config *config)
 {
-    GUARD_AS_POSIX(s2n_array_free(conf->preferred_key_shares));
-    conf->preferred_key_shares = s2n_array_new(sizeof(uint16_t));
+    S2N_ERROR_IF(!S2N_IN_TEST, S2N_ERR_NOT_IN_TEST);
+    notnull_check(config);
+    GUARD_AS_POSIX(s2n_array_free(config->preferred_key_shares));
+    config->preferred_key_shares = s2n_array_new(sizeof(uint16_t));
     return 0;
 }
 
 
-int s2n_config_add_keyshare_by_group(struct s2n_config *conf, uint16_t iana_id)
+int s2n_config_add_keyshare_by_group_for_testing(struct s2n_config *config, uint16_t iana_id)
 {
-    struct s2n_result;
+    S2N_ERROR_IF(!S2N_IN_TEST, S2N_ERR_NOT_IN_TEST);
+    notnull_check(config);
     for (int i = 0; i < s2n_all_supported_curves_list_len; i++) {
         if (s2n_all_supported_curves_list[i]->iana_id == iana_id) {
-            GUARD_AS_POSIX(s2n_array_insert_and_copy(conf->preferred_key_shares, conf->preferred_key_shares->len, &iana_id));
+            GUARD_AS_POSIX(s2n_array_insert_and_copy(config->preferred_key_shares, config->preferred_key_shares->len, &iana_id));
             return 0;
         }
     }
@@ -850,20 +853,24 @@ int s2n_config_add_keyshare_by_group(struct s2n_config *conf, uint16_t iana_id)
     S2N_ERROR(S2N_ERR_INVALID_CIPHER_PREFERENCES);
 }
 
-int s2n_config_add_all_curves(struct s2n_config *conf)
+int s2n_config_add_all_curves(struct s2n_config *config)
 {
+    S2N_ERROR_IF(!S2N_IN_TEST, S2N_ERR_NOT_IN_TEST);
+    notnull_check(config);
     for (int i = 0; i < s2n_all_supported_curves_list_len; i++) {
         const struct s2n_ecc_named_curve *curve = s2n_all_supported_curves_list[i];
         uint16_t curve_iana_id = curve->iana_id;
-        GUARD_AS_POSIX(s2n_array_insert_and_copy(conf->preferred_key_shares, conf->preferred_key_shares->len, &curve_iana_id));
+        GUARD_AS_POSIX(s2n_array_insert_and_copy(config->preferred_key_shares, config->preferred_key_shares->len, &curve_iana_id));
     }
 
     return 0;
 }
 
-int s2n_config_send_empty_keyshare(struct s2n_config *conf)
+int s2n_config_send_empty_keyshare_for_testing(struct s2n_config *config)
 {
-    conf->client_send_empty_key_shares = 1;
+    S2N_ERROR_IF(!S2N_IN_TEST, S2N_ERR_NOT_IN_TEST);
+    notnull_check(config);
+    config->client_send_empty_key_shares = 1;
 
     return 0;
 }

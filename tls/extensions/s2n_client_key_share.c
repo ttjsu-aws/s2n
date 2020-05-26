@@ -20,6 +20,7 @@
 #include "error/s2n_errno.h"
 #include "stuffer/s2n_stuffer.h"
 #include "utils/s2n_safety.h"
+#include "tls/s2n_tls13.h"
 
 /**
  * Specified in https://tools.ietf.org/html/rfc8446#section-4.2.8
@@ -46,22 +47,6 @@
 
 static int s2n_client_key_share_send(struct s2n_connection *conn, struct s2n_stuffer *out);
 static int s2n_client_key_share_recv(struct s2n_connection *conn, struct s2n_stuffer *extension);
-
-/* from RFC: https://tools.ietf.org/html/rfc8446#section-4.1.3 */
-uint8_t hrr_random[S2N_TLS_RANDOM_DATA_LEN] = {
-    0xCF, 0x21, 0xAD, 0x74, 0xE5, 0x9A, 0x61, 0x11, 0xBE, 0x1D, 0x8C, 0x02, 0x1E, 0x65, 0xB8, 0x91,
-    0xC2, 0xA2, 0x11, 0x16, 0x7A, 0xBB, 0x8C, 0x5E, 0x07, 0x9E, 0x09, 0xE2, 0xC8, 0xA8, 0x33, 0x9C
-};
-
-/* Lets the client determine whether the ClientHello is a responde to a HelloRetryRequest*/
-static bool s2n_server_hello_is_hrr(struct s2n_connection *conn)
-{
-    notnull_check(conn);
-
-    bool has_correct_random = (memcmp(hrr_random, conn->secure.server_random, S2N_TLS_RANDOM_DATA_LEN) == 0);
-
-    return has_correct_random;
-}
 
 const s2n_extension_type s2n_client_key_share_extension = {
     .iana_value = TLS_EXTENSION_KEY_SHARE,
