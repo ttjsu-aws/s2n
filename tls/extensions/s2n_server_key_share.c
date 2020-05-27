@@ -184,6 +184,7 @@ int s2n_extensions_server_key_share_select(struct s2n_connection *conn)
 
     /* Client sent no keyshares, need to send Hello Retry Request with first negotiated curve */
     if (conn->secure.server_ecc_evp_params.negotiated_curve) {
+        printf("\n Client sent no keyshares, set hello retry request");
         GUARD(s2n_set_hello_retry_required(conn));
         return 0;
     }

@@ -409,6 +409,7 @@ int s2n_ecc_evp_write_params(struct s2n_ecc_evp_params *ecc_evp_params, struct s
 int s2n_ecc_evp_parse_params_point(struct s2n_blob *point_blob, struct s2n_ecc_evp_params *ecc_evp_params) {
     notnull_check(point_blob->data);
     notnull_check(ecc_evp_params->negotiated_curve);
+    printf("\n Parsing Curve: %s", ecc_evp_params->negotiated_curve->name);
     S2N_ERROR_IF(point_blob->size != ecc_evp_params->negotiated_curve->share_size, S2N_ERR_ECDHE_SERIALIZING);
 
 #if EVP_APIS_SUPPORTED
@@ -428,6 +429,7 @@ int s2n_ecc_evp_parse_params_point(struct s2n_blob *point_blob, struct s2n_ecc_e
     }
     GUARD_OSSL(EVP_PKEY_set1_tls_encodedpoint(ecc_evp_params->evp_pkey, point_blob->data, point_blob->size),
                S2N_ERR_ECDHE_SERIALIZING);
+    printf("\n Successfully obtained encoded point for curve : %s", ecc_evp_params->negotiated_curve->name);
 #else
     if (ecc_evp_params->evp_pkey == NULL) {
         ecc_evp_params->evp_pkey = EVP_PKEY_new();

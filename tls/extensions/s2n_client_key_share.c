@@ -101,15 +101,14 @@ static int s2n_send_empty_keyshares(struct s2n_connection *conn, struct s2n_stuf
     const struct s2n_ecc_preferences *ecc_pref = NULL;
     GUARD(s2n_connection_get_ecc_preferences(conn, &ecc_pref));
     notnull_check(ecc_pref);
-
     for(int i = 0; i < ecc_pref->count; i++) {
         ecc_evp_params = &conn->secure.client_ecc_evp_params[i];
         named_curve = ecc_pref->ecc_curves[i];
         ecc_evp_params->negotiated_curve = named_curve;
         ecc_evp_params->evp_pkey = NULL;
-        GUARD(s2n_stuffer_write_uint16(out, ecc_evp_params->negotiated_curve->iana_id));
-        GUARD(s2n_stuffer_write_uint16(out, ecc_evp_params->negotiated_curve->share_size));
-        GUARD(s2n_stuffer_skip_write(out, ecc_evp_params->negotiated_curve->share_size));
+            GUARD(s2n_stuffer_write_uint16(out, ecc_evp_params->negotiated_curve->iana_id));
+            GUARD(s2n_stuffer_write_uint16(out, ecc_evp_params->negotiated_curve->share_size));
+            GUARD(s2n_stuffer_skip_write(out, ecc_evp_params->negotiated_curve->share_size));
     }
     return S2N_SUCCESS;
 }
@@ -263,13 +262,16 @@ static int s2n_client_key_share_recv(struct s2n_connection *conn, struct s2n_stu
         }
 
         GUARD(s2n_ecc_evp_read_params_point(extension, share_size, &point_blob));
+        printf("\n Curve: %s Point blob data: %p size: %d ", supported_curve->name, (void*)point_blob.data, point_blob.size);
 
         conn->secure.client_ecc_evp_params[supported_curve_index].negotiated_curve = supported_curve;
         if (s2n_ecc_evp_parse_params_point(&point_blob, &conn->secure.client_ecc_evp_params[supported_curve_index]) < 0) {
+            printf("\n Failed to obtain encoded point for curve : %s", supported_curve->name);
             /* Ignore curves with points we can't parse */
             conn->secure.client_ecc_evp_params[supported_curve_index].negotiated_curve = NULL;
             GUARD(s2n_ecc_evp_params_free(&conn->secure.client_ecc_evp_params[supported_curve_index]));
         } else {
+            printf("\n Match found for curve: %s",  supported_curve->name);
             match = 1;
         }
     }
@@ -277,6 +279,7 @@ static int s2n_client_key_share_recv(struct s2n_connection *conn, struct s2n_stu
     /* If there was no matching key share then we received an empty key share extension
      * or we didn't match a keyshare with a supported group. We should send a retry. */
     if (match == 0) {
+        printf("\n Match not found, set hello retry request");
         GUARD(s2n_set_hello_retry_required(conn));
     }
 
