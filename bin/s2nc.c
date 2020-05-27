@@ -34,6 +34,7 @@
 #include <error/s2n_errno.h>
 
 #include "tls/s2n_tls13.h"
+#include "tls/s2n_connection.h"
 #include "utils/s2n_safety.h"
 
 void usage()
@@ -391,9 +392,6 @@ int main(int argc, char *const *argv)
 
         struct s2n_config *config = s2n_config_new();
         setup_s2n_config(config, cipher_prefs, type, &unsafe_verify_data, host, alpn_protocols, mfl_value);
-        if (keyshare != 0) {
-            s2n_config_add_keyshare_by_group_for_testing(config, keyshare);
-        }
 
         if (ca_file || ca_dir) {
             if (s2n_config_set_verification_ca_location(config, ca_file, ca_dir) < 0) {
@@ -422,6 +420,10 @@ int main(int argc, char *const *argv)
         GUARD_EXIT(s2n_connection_set_fd(conn, sockfd) , "Error setting file descriptor");
 
         GUARD_EXIT(s2n_connection_set_client_auth_type(conn, S2N_CERT_AUTH_OPTIONAL), "Error setting ClientAuth optional");
+
+        if (keyshare != 0) {
+            GUARD_EXIT(s2n_connection_set_keyshare_by_group_for_testing(conn, keyshare), "Error setting keyshare to generate");
+        }
 
         if (use_corked_io) {
             GUARD_EXIT(s2n_connection_use_corked_io(conn), "Error setting corked io");

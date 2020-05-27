@@ -40,10 +40,6 @@ struct s2n_config {
     unsigned disable_x509_validation:1;
     unsigned max_verify_cert_chain_depth_set:1;
 
-    /* list of groups to generate keyshare */
-    struct s2n_array *preferred_key_shares;
-    unsigned client_send_empty_key_shares:1;
-
     struct s2n_dh_params *dhparams;
     /* Needed until we can deprecate s2n_config_add_cert_chain_and_key. This is
      * used to release memory allocated only in the deprecated API that the application 
@@ -110,8 +106,3 @@ int s2n_config_free_session_ticket_keys(struct s2n_config *config);
 void s2n_wipe_static_configs(void);
 extern struct s2n_cert_chain_and_key *s2n_config_get_single_default_cert(struct s2n_config *config);
 int s2n_config_get_num_default_certs(struct s2n_config *config);
-
-int s2n_config_clear_all_curves_for_testing(struct s2n_config *config);
-int s2n_config_add_keyshare_by_group_for_testing(struct s2n_config *config, uint16_t iana_id);
-int s2n_config_send_empty_keyshare_for_testing(struct s2n_config *config);
-int s2n_config_add_all_curves_for_testing(struct s2n_config *config);

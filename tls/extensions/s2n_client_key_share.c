@@ -57,9 +57,9 @@ const s2n_extension_type s2n_client_key_share_extension = {
     .if_missing = s2n_extension_noop_if_missing,
 };
 
-static int s2n_add_keyshare_from_config(struct s2n_connection *conn, struct s2n_stuffer *out)
+static int s2n_generate_preferred_key_shares(struct s2n_connection *conn, struct s2n_stuffer *out)
 {
-    struct s2n_array *key_shares = conn->config->preferred_key_shares;
+    uint8_t key_shares = conn->preferred_key_shares;
     const struct s2n_ecc_named_curve *named_curve = NULL;
     struct s2n_ecc_evp_params *ecc_evp_params = NULL;
 
@@ -67,24 +67,18 @@ static int s2n_add_keyshare_from_config(struct s2n_connection *conn, struct s2n_
     GUARD(s2n_connection_get_ecc_preferences(conn, &ecc_pref));
     notnull_check(ecc_pref);
 
-    for (uint32_t i = 0; i < key_shares->len; i++) {
-        uint16_t *curve_iana_id = NULL;
-        GUARD_AS_POSIX(s2n_array_get(key_shares, i, (void **)&curve_iana_id));
-        notnull_check(curve_iana_id);
-
-        for (uint32_t j = 0; j < ecc_pref->count; j++) {
-            if (*curve_iana_id == ecc_pref->ecc_curves[j]->iana_id) {
-                ecc_evp_params = &conn->secure.client_ecc_evp_params[j];
-                named_curve = ecc_pref->ecc_curves[j];
-                 ecc_evp_params->negotiated_curve = named_curve;
-                ecc_evp_params->evp_pkey = NULL;
-                GUARD(s2n_ecdhe_parameters_send(ecc_evp_params, out));
-                break;
-            }
+    for (int i = 1; i <= ecc_pref->count; i++) {
+        if ((key_shares >> i) & 1) {
+            ecc_evp_params = &conn->secure.client_ecc_evp_params[i-1];
+            named_curve = ecc_pref->ecc_curves[i-1];
+            ecc_evp_params->negotiated_curve = named_curve;
+            ecc_evp_params->evp_pkey = NULL;
+            GUARD(s2n_ecdhe_parameters_send(ecc_evp_params, out));
+            break;
         }
     }
 
-    for (uint32_t i = 0; i < ecc_pref->count; i++) {
+    for (int i = 0; i < ecc_pref->count; i++) {
         ecc_evp_params = &conn->secure.client_ecc_evp_params[i];
         named_curve = ecc_pref->ecc_curves[i];
 
@@ -108,7 +102,7 @@ static int s2n_send_empty_keyshares(struct s2n_connection *conn, struct s2n_stuf
     GUARD(s2n_connection_get_ecc_preferences(conn, &ecc_pref));
     notnull_check(ecc_pref);
 
-    for (uint32_t i = 0; i < ecc_pref->count; i++) {
+    for(int i = 0; i < ecc_pref->count; i++) {
         ecc_evp_params = &conn->secure.client_ecc_evp_params[i];
         named_curve = ecc_pref->ecc_curves[i];
         ecc_evp_params->negotiated_curve = named_curve;
@@ -170,25 +164,25 @@ static int s2n_ecdhe_supported_curves_send(struct s2n_connection *conn, struct s
         return S2N_SUCCESS;
     }
     
-    /* Set the connection's key shares based on the configuration */
-    if ( conn->config->preferred_key_shares->len > 0) {
-        GUARD(s2n_add_keyshare_from_config(conn, out));
-        return S2N_SUCCESS;
-    } 
-
-    /* Send an empty list of keyshares */
-    if (conn->config->client_send_empty_key_shares) {
+    /* If lsb of the bitmap is set, send an empty list of keyshares */
+    if (conn->preferred_key_shares & 1) {
         GUARD(s2n_send_empty_keyshares(conn, out));
         return S2N_SUCCESS;
     }
-    
-    for (uint32_t i = 0; i < ecc_pref->count; i++) {
+
+    /* Set the connection's key shares based on the conn->preferred_key_shares bitmap values */
+    if (conn->preferred_key_shares >> 1) {
+        GUARD(s2n_generate_preferred_key_shares(conn, out));
+        return S2N_SUCCESS;
+    }
+
+    for (int i = 0; i < ecc_pref->count; i++) {
         ecc_evp_params = &conn->secure.client_ecc_evp_params[i];
         named_curve = ecc_pref->ecc_curves[i];
 
         ecc_evp_params->negotiated_curve = named_curve;
         ecc_evp_params->evp_pkey = NULL;
-       GUARD(s2n_ecdhe_parameters_send(ecc_evp_params, out));
+        GUARD(s2n_ecdhe_parameters_send(ecc_evp_params, out));
     }
 
     return S2N_SUCCESS;
@@ -242,7 +236,7 @@ static int s2n_client_key_share_recv(struct s2n_connection *conn, struct s2n_stu
         bytes_processed += share_size + S2N_SIZE_OF_NAMED_GROUP + S2N_SIZE_OF_KEY_SHARE_SIZE;
 
         supported_curve = NULL;
-        for (uint32_t i = 0; i < ecc_pref->count; i++) {
+        for (int i = 0; i < ecc_pref->count; i++) {
             if (named_group == ecc_pref->ecc_curves[i]->iana_id) {
                 supported_curve_index = i;
                 supported_curve = ecc_pref->ecc_curves[i];
