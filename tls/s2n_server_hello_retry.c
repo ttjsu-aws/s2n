@@ -32,22 +32,18 @@ uint8_t hello_retry_req_random[S2N_TLS_RANDOM_DATA_LEN] = {
     0xC2, 0xA2, 0x11, 0x16, 0x7A, 0xBB, 0x8C, 0x5E, 0x07, 0x9E, 0x09, 0xE2, 0xC8, 0xA8, 0x33, 0x9C
 };
 
-bool s2n_check_if_hrr_random(struct s2n_connection *conn)
+bool s2n_is_hello_retry_valid(struct s2n_connection *conn)
 {
-    return (memcmp(hello_retry_req_random, conn->secure.server_random, S2N_TLS_RANDOM_DATA_LEN) == 0);
+    bool has_correct_server_version = conn->server_protocol_version >= S2N_TLS13;
+    bool has_correct_client_version = conn->client_protocol_version == S2N_TLS13;
+    bool has_correct_random = (memcmp(hello_retry_req_random, conn->secure.server_random, S2N_TLS_RANDOM_DATA_LEN) == 0);
+
+    return has_correct_server_version && has_correct_client_version && has_correct_random;
 }
 
 static int s2n_conn_reset_retry_values(struct s2n_connection *conn)
 {
     notnull_check(conn);
-    const struct s2n_ecc_preferences *ecc_prefs = NULL;
-    GUARD(s2n_connection_get_ecc_preferences(conn, &ecc_prefs));
-    notnull_check(ecc_prefs);
-
-    /* Reset the list of keyshares */
-    for (size_t i = 0; i < ecc_prefs->count; i++) {
-        GUARD(s2n_ecc_evp_params_free(&conn->secure.client_ecc_evp_params[i]));
-    }
 
     /* Reset handshake values */
     conn->handshake.client_hello_received = 0;
@@ -97,11 +93,16 @@ int s2n_server_hello_retry_recv(struct s2n_connection *conn)
      * If either of these checks fails, then the client MUST abort the handshake.
      * */
 
+    bool match = false;
+
     for (size_t i = 0; i < ecc_pref->count; i++) {
-        if (named_curve == conn->secure.client_ecc_evp_params[i].negotiated_curve
-                        && conn->secure.client_ecc_evp_params[i].evp_pkey != NULL) {
-            S2N_ERROR(S2N_ERR_BAD_MESSAGE);
+        if (named_curve == conn->secure.client_ecc_evp_params[i].negotiated_curve) {
+            match = true;
+            S2N_ERROR_IF(conn->secure.client_ecc_evp_params[i].evp_pkey != NULL, S2N_ERR_BAD_MESSAGE);
         }
     }
+
+    S2N_ERROR_IF(!match, S2N_ERR_BAD_MESSAGE);
+
     return S2N_SUCCESS;
 }

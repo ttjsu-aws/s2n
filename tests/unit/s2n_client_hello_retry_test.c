@@ -110,7 +110,7 @@ int main(int argc, char **argv)
 
         /* There was no matching key share received with a supported group, we should send a retry */
         EXPECT_TRUE(s2n_is_hello_retry_handshake(server_conn));
-        EXPECT_SUCCESS(s2n_set_connection_hello_retry_flags(server_conn));
+        EXPECT_SUCCESS(s2n_set_connection_hello_retry_flags(server_conn, 1));
         EXPECT_TRUE(s2n_is_hello_retry_message(server_conn));
         
         /* Verify server negotiated group is secp256r1 */
@@ -121,7 +121,8 @@ int main(int argc, char **argv)
         EXPECT_SUCCESS(s2n_stuffer_wipe(&client_conn->handshake.io));
         EXPECT_SUCCESS(s2n_stuffer_copy(&server_conn->handshake.io, &client_conn->handshake.io,
                                         s2n_stuffer_data_available(&server_conn->handshake.io)));
-        
+
+        EXPECT_SUCCESS(s2n_set_connection_hello_retry_flags(client_conn, 1));
         EXPECT_SUCCESS(s2n_server_hello_recv(client_conn));
         /* Verify that a Server HelloRetryRequest message was received */
         EXPECT_TRUE(s2n_is_hello_retry_handshake(client_conn));
@@ -144,7 +145,7 @@ int main(int argc, char **argv)
                                         s2n_stuffer_data_available(&client_conn->handshake.io)));
 
         EXPECT_SUCCESS(s2n_client_hello_recv(server_conn));
-        s2n_set_connection_server_hello_flags(server_conn);
+        EXPECT_SUCCESS(s2n_set_connection_hello_retry_flags(server_conn, 5));
         EXPECT_SUCCESS(s2n_server_hello_send(server_conn));
 
         EXPECT_SUCCESS(s2n_config_free(client_config));
@@ -197,7 +198,7 @@ int main(int argc, char **argv)
 
         /* There was no matching key share received, we should send a retry */
         EXPECT_TRUE(s2n_is_hello_retry_handshake(server_conn));
-        EXPECT_SUCCESS(s2n_set_connection_hello_retry_flags(server_conn));
+        EXPECT_SUCCESS(s2n_set_connection_hello_retry_flags(server_conn, 1));
         EXPECT_TRUE(s2n_is_hello_retry_message(server_conn));
 
         server_conn->secure.server_ecc_evp_params.negotiated_curve = ecc_pref->ecc_curves[0];
@@ -214,6 +215,7 @@ int main(int argc, char **argv)
         EXPECT_SUCCESS(s2n_stuffer_copy(&server_conn->handshake.io, &client_conn->handshake.io,
                                         s2n_stuffer_data_available(&server_conn->handshake.io)));
 
+        EXPECT_SUCCESS(s2n_set_connection_hello_retry_flags(client_conn, 1));
         EXPECT_SUCCESS(s2n_server_hello_recv(client_conn));
         /* Verify that a Server HelloRetryRequest message was received */
         EXPECT_TRUE(s2n_is_hello_retry_handshake(client_conn));

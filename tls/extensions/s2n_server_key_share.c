@@ -92,20 +92,18 @@ static int s2n_server_key_share_recv(struct s2n_connection *conn, struct s2n_stu
 
     S2N_ERROR_IF(supported_curve_index < 0, S2N_ERR_ECDHE_UNSUPPORTED_CURVE);
 
+    struct s2n_ecc_evp_params* server_ecc_evp_params = &conn->secure.server_ecc_evp_params;
+    server_ecc_evp_params->negotiated_curve = ecc_pref->ecc_curves[supported_curve_index];
+
     /* If this is a HelloRetryRequest, we won't have a key share. We just have the selected group.
      * Set the server negotiated curve and exit early so a proper keyshare can be generated. 
      */
-    if (s2n_is_hello_retry_handshake(conn)) {
-        struct s2n_ecc_evp_params* server_ecc_evp_params = &conn->secure.server_ecc_evp_params;
-        server_ecc_evp_params->negotiated_curve = ecc_pref->ecc_curves[supported_curve_index];
-        return 0;
+    if (s2n_is_hello_retry_handshake(conn) && s2n_is_hello_retry_valid(conn)) {
+        return S2N_SUCCESS;
     }
 
     /* Key share not sent by client */
     S2N_ERROR_IF(conn->secure.client_ecc_evp_params[supported_curve_index].evp_pkey == NULL, S2N_ERR_BAD_KEY_SHARE);
-
-    struct s2n_ecc_evp_params* server_ecc_evp_params = &conn->secure.server_ecc_evp_params;
-    server_ecc_evp_params->negotiated_curve = ecc_pref->ecc_curves[supported_curve_index];
 
     uint16_t share_size;
     S2N_ERROR_IF(s2n_stuffer_data_available(extension) < sizeof(share_size), S2N_ERR_BAD_KEY_SHARE);
@@ -130,7 +128,7 @@ int s2n_extensions_server_key_share_send_check(struct s2n_connection *conn)
     /* If we are responding to a retry request then we don't have a valid
      * curve from the client. Just return 0 so a selected group will be
      * chosen for the key share. */
-    if (s2n_is_hello_retry_handshake(conn)) {
+    if (s2n_is_hello_retry_message(conn)) {
         return 0;
     }
 
