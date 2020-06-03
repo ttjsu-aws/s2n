@@ -60,8 +60,8 @@ int s2n_tls13_compute_shared_secret(struct s2n_connection *conn, struct s2n_blob
     notnull_check(ecc_preferences);
 
     struct s2n_ecc_evp_params *server_key = &conn->secure.server_ecc_evp_params;
-    notnull_check(server_key);
     notnull_check(server_key->negotiated_curve);
+    notnull_check(server_key->evp_pkey);
     /* for now we do this tedious loop to find the matching client key selection.
      * this can be simplified if we get an index or a pointer to a specific key */
     int selection = -1;
@@ -74,7 +74,8 @@ int s2n_tls13_compute_shared_secret(struct s2n_connection *conn, struct s2n_blob
 
     S2N_ERROR_IF(selection < 0, S2N_ERR_BAD_KEY_SHARE);
     struct s2n_ecc_evp_params *client_key = &conn->secure.client_ecc_evp_params[selection];
-    notnull_check(client_key);
+    notnull_check(client_key->negotiated_curve);
+    notnull_check(client_key->evp_pkey);
 
     if (conn->mode == S2N_CLIENT) {
         GUARD(s2n_ecc_evp_compute_shared_secret_from_params(client_key, server_key, shared_secret));
