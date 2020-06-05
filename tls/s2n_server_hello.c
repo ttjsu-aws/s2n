@@ -105,6 +105,12 @@ static int s2n_server_hello_parse(struct s2n_connection *conn)
     GUARD(s2n_stuffer_read_bytes(in, protocol_version, S2N_TLS_PROTOCOL_VERSION_LEN));
     GUARD(s2n_stuffer_read_bytes(in, conn->secure.server_random, S2N_TLS_RANDOM_DATA_LEN));
 
+    /* If the client receives a second HelloRetryRequest in the same connection, it MUST send an error. */
+    if ((s2n_hello_retry_validate(conn) == S2N_SUCCESS)) {
+        ENSURE_POSIX(!s2n_is_hello_retry_handshake(conn), S2N_ERR_INVALID_HELLO_RETRY);
+        GUARD(s2n_set_hello_retry_required(conn));
+    }
+
     GUARD(s2n_stuffer_read_uint8(in, &session_id_len));
     S2N_ERROR_IF(session_id_len > S2N_TLS_SESSION_ID_MAX_LEN, S2N_ERR_BAD_MESSAGE);
     GUARD(s2n_stuffer_read_bytes(in, session_id, session_id_len));
@@ -158,18 +164,11 @@ static int s2n_server_hello_parse(struct s2n_connection *conn)
         }
     }
 
+    if ((s2n_hello_retry_validate(conn) == S2N_SUCCESS)) {
+        ENSURE_POSIX(conn->actual_protocol_version >= S2N_TLS13, S2N_ERR_INVALID_HELLO_RETRY);
+    }
+
     return 0;
-}
-
-/* Lets the client determine whether a HelloRetryRequest is valid */
-static bool s2n_server_hello_retry_is_valid(struct s2n_connection *conn)
-{
-    notnull_check(conn);
-
-    bool has_versions_ext = conn->server_protocol_version >= S2N_TLS13;
-    bool has_correct_random = (memcmp(hello_retry_req_random, conn->secure.server_random, S2N_TLS_RANDOM_DATA_LEN) == 0);
-
-    return has_versions_ext && has_correct_random && conn->client_protocol_version == S2N_TLS13;
 }
 
 int s2n_server_hello_recv(struct s2n_connection *conn)
@@ -179,16 +178,16 @@ int s2n_server_hello_recv(struct s2n_connection *conn)
     /* Read the message off the wire */
     GUARD(s2n_server_hello_parse(conn));
 
-    /* If this is a HelloRetryRequest, we don't process the ServerHello.
-     * Instead we proceed with retry logic. */
-    if (s2n_server_hello_retry_is_valid(conn)) {
-        GUARD(s2n_server_hello_retry_recv(conn));
-        return 0;
-    }
-
     conn->actual_protocol_version_established = 1;
 
     GUARD(s2n_conn_set_handshake_type(conn));
+
+    /* If this is a HelloRetryRequest, we don't process the ServerHello.
+     * Instead we proceed with retry logic. */
+    if ((s2n_hello_retry_validate(conn) == S2N_SUCCESS) && (conn->actual_protocol_version >= S2N_TLS13)) {
+        GUARD(s2n_server_hello_retry_recv(conn));
+        return 0;
+    }
 
     if (IS_RESUMPTION_HANDSHAKE(conn->handshake.handshake_type)) {
         GUARD(s2n_prf_key_expansion(conn));
