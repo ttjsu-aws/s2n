@@ -30,19 +30,5 @@ def pytest_collection_modifyitems(config, items):
         items[:] = kept
 
 
-def pytest_xdist_node_collection_finished(node, ids):
-    """
-    NOTE: Unimplemented. This is a placeholder for an xdist hook
-    that will help distribute port numbers when tests are run
-    in parallel.
-    """
-    pass
 
 
-def pytest_configure_node(node):
-    """
-    NOTE: Unimplemented. This is a placeholder for an xdist hook
-    that will help distribute port numbers when tests are run
-    in parallel.
-    """
-    pass
