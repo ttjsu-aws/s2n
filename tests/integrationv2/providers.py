@@ -147,6 +147,8 @@ class S2N(Provider):
             cmd_line.extend(['--cert', options.client_certificate_file])
 
         cmd_line.extend([options.host, options.port])
+        if options.extra_flags is not None:
+            cmd_line.extend(options.extra_flags)
 
         # Clients are always ready to connect
         self.set_provider_ready()
