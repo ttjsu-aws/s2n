@@ -123,13 +123,14 @@ def main():
 
     failed = 0
 
+    x25519 = [Curve("X25519", Version.TLS13)]
     print("\n\tRunning TLS1.3 handshake tests with openssl: %s" % os.popen('openssl version').read())
-    failed += run_openssl_connection_test(get_scenarios(host, port, versions=[Version.TLS13], s2n_modes=Mode.all(), ciphers=Cipher.all()))
+    failed += run_openssl_connection_test(get_scenarios(host, port, versions=[Version.TLS13], s2n_modes=Mode.all(), curves=x25519, ciphers=Cipher.all()))
     print("\n\tRunning TLS1.3 HRR tests with openssl: %s" % os.popen('openssl version').read())
-    failed += run_openssl_connection_test(get_scenarios(host, port, versions=[Version.TLS13], s2n_modes=[Mode.server], ciphers=Cipher.all(),
-                                                        peer_flags=['-msg', '-curves', 'X448:P-256']), test_func=verify_hrr_random_data)
+    failed += run_openssl_connection_test(get_scenarios(host, port, versions=[Version.TLS13], s2n_modes=[Mode.server], curves=x25519, ciphers=Cipher.all(),
+                                                        peer_flags=['-msg', '-curves', 'X448:X25519']), test_func=verify_hrr_random_data)
     print("\n\tRunning TLS1.3 key update tests with openssl: %s" % os.popen('openssl version').read())
-    failed += run_openssl_connection_test(get_scenarios(host, port, versions=[Version.TLS13], s2n_modes=[Mode.server], ciphers=Cipher.all()),
+    failed += run_openssl_connection_test(get_scenarios(host, port, versions=[Version.TLS13], s2n_modes=[Mode.server], curves=x25519, ciphers=Cipher.all()),
                                                          test_func=key_update_test)
 
     return failed
