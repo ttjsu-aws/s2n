@@ -345,7 +345,7 @@ static message_type_t handshakes[S2N_HANDSHAKES_COUNT][S2N_MAX_HANDSHAKE_LENGTH]
 /*
  * This selection of handshakes resembles the standard set, but with changes made to support tls1.3.
  *
- * These are just the basic handshakes. At the moment hello retries, session resumption, and early data are not supported.
+ * These are just the basic handshakes. At the moment session resumption, and early data are not supported.
  *
  * The CHANGE_CIPHER_SPEC messages are included only for middlebox compatibility.
  * See https://tools.ietf.org/html/rfc8446#appendix-D.4
