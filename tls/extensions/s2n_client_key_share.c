@@ -63,7 +63,7 @@ const s2n_extension_type s2n_client_key_share_extension = {
 static int s2n_generate_preferred_key_shares(struct s2n_connection *conn, struct s2n_stuffer *out)
 {
     notnull_check(conn);
-    uint8_t preferred_key_shares = conn->preferred_key_shares;
+    uint8_t preferred_key_shares = conn->hint.preferred_key_shares;
     struct s2n_ecc_evp_params *ecc_evp_params = NULL;
 
     const struct s2n_ecc_preferences *ecc_pref = NULL;
@@ -75,7 +75,7 @@ static int s2n_generate_preferred_key_shares(struct s2n_connection *conn, struct
         return S2N_SUCCESS;
     }
 
-    if (!conn->preferred_key_shares) {
+    if (!conn->hint.preferred_key_shares) {
         /* Default behavior is to generate keyshares for all curves.
         * The bitmap to generate keyshares for all curve is 111111110 (254),
         * i.e. all bit values set except lsb which is RESERVED for empty keyshares */

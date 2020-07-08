@@ -134,7 +134,7 @@ int main(int argc, char **argv)
             EXPECT_SUCCESS(s2n_connection_set_config(server_conn, server_config));
 
             /* Force the HRR path by sending an empty list of keyshares */
-            EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name_for_testing(client_conn, "none"));
+            EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name(client_conn, "none"));
 
             /* ClientHello 1 */
             EXPECT_SUCCESS(s2n_client_hello_send(client_conn));
@@ -204,7 +204,7 @@ int main(int argc, char **argv)
         EXPECT_SUCCESS(s2n_connection_set_config(server_conn, server_config));
 
         /* Force the HRR path by sending an empty list of keyshares */
-        EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name_for_testing(client_conn, "none"));
+        EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name(client_conn, "none"));
 
         /* ClientHello 1 */
         EXPECT_SUCCESS(s2n_client_hello_send(client_conn));
@@ -313,7 +313,7 @@ int main(int argc, char **argv)
 
 
         /* Generate keyshare only for Curve x25519 */
-        EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name_for_testing(client_conn, "none"));
+        EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name(client_conn, "none"));
 
         EXPECT_SUCCESS(s2n_connections_set_io_pair(client_conn, server_conn, &io_pair));
 
@@ -374,7 +374,7 @@ int main(int argc, char **argv)
 
 
         /* Generate keyshare only for Curve x25519 */
-        EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name_for_testing(client_conn, "x25519"));
+        EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name(client_conn, "x25519"));
 
         EXPECT_SUCCESS(s2n_connections_set_io_pair(client_conn, server_conn, &io_pair));
 
@@ -422,7 +422,7 @@ int main(int argc, char **argv)
         EXPECT_SUCCESS(s2n_connection_set_config(server_conn, server_config));
 
         /* Force the client to send an empty list of keyshares */
-        EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name_for_testing(client_conn, "none"));
+        EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name(client_conn, "none"));
 
         /* ClientHello 1 */
         EXPECT_SUCCESS(s2n_client_hello_send(client_conn));

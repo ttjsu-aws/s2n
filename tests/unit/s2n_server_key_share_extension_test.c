@@ -434,7 +434,7 @@ int main(int argc, char **argv)
             struct s2n_stuffer *key_share_extension = &server_conn->handshake.io;
 
             EXPECT_SUCCESS(s2n_connection_set_all_protocol_versions(server_conn, S2N_TLS13));
-            EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name_for_testing(client_conn, "none"));
+            EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name(client_conn, "none"));
 
             server_conn->secure.server_ecc_evp_params.negotiated_curve = s2n_all_supported_curves_list[0];
             EXPECT_SUCCESS(s2n_set_connection_hello_retry_flags(server_conn));

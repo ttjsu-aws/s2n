@@ -360,7 +360,7 @@ int main(int argc, char **argv)
         EXPECT_SUCCESS(s2n_connection_set_all_protocol_versions(client_conn, S2N_TLS13));
 
         /* Force HRR path by sending an empty list of keyshares */
-        EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name_for_testing(client_conn, "none"));
+        EXPECT_SUCCESS(s2n_connection_set_keyshare_by_name(client_conn, "none"));
 
         /* Send the first CH message */
         EXPECT_SUCCESS(s2n_client_hello_send(client_conn));
