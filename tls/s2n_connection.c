@@ -1394,3 +1394,50 @@ int s2n_connection_set_keyshare_by_name_for_testing(struct s2n_connection *conn,
 
     POSIX_BAIL(S2N_ERR_ECDHE_UNSUPPORTED_CURVE);
 }
+
+int s2n_connection_get_peer_cert_chain(struct s2n_connection *conn, struct s2n_cert_chain_and_key *cert_chain_and_key)
+{
+    POSIX_ENSURE_REF(conn);
+    POSIX_ENSURE_REF(cert_chain_and_key);
+    POSIX_ENSURE_REF(conn->secure.peer_cert_chain.data);
+
+    DEFER_CLEANUP(struct s2n_stuffer cert_chain_stuffer = { 0 }, s2n_stuffer_free);
+    POSIX_GUARD(s2n_stuffer_init(&cert_chain_stuffer, &conn->secure.peer_cert_chain));
+    POSIX_GUARD(s2n_stuffer_write(&cert_chain_stuffer, &conn->secure.peer_cert_chain));
+
+    struct s2n_cert **insert = cert_chain_and_key->cert_chain->head;
+    uint32_t chain_size = 0;
+
+    while (s2n_stuffer_data_available(&cert_chain_stuffer)) {
+        struct s2n_blob cert_blob = { 0 };
+        POSIX_GUARD(s2n_stuffer_read_uint24(&cert_chain_stuffer, &cert_blob.size));
+        POSIX_ENSURE_LT(cert_blob.size, s2n_stuffer_data_available(&cert_chain_stuffer));
+        POSIX_ENSURE_GT(cert_blob.size, 0);
+        cert_blob.data = s2n_stuffer_raw_read(&cert_chain_stuffer, cert_blob.size);
+        POSIX_ENSURE_REF(cert_blob.data);
+
+        struct s2n_cert *new_node = NULL;
+        struct s2n_blob mem = { 0 };
+        POSIX_GUARD(s2n_alloc(&mem, sizeof(struct s2n_cert)));
+        new_node = (struct s2n_cert *)(void *)mem.data;
+
+        if (s2n_alloc(&new_node->raw, cert_blob.size) != S2N_SUCCESS) {
+            POSIX_GUARD(s2n_free(&mem));
+            S2N_ERROR_PRESERVE_ERRNO();
+        }
+
+        POSIX_GUARD(s2n_blob_init(&new_node->raw, cert_blob.data, cert_blob.size));
+
+        /* Additional 3 bytes for the length field in the protocol */
+        chain_size += new_node->raw.size + 3;
+        new_node->next = NULL;
+        *insert = new_node;
+        insert = &new_node->next;
+    }
+
+    /* Leftover data at this point means it is a malformed peer chain. Be conservative and fail. */
+    S2N_ERROR_IF(s2n_stuffer_data_available(&cert_chain_stuffer) > 0, S2N_ERR_INVALID_STATE);
+    cert_chain_and_key->cert_chain->chain_size = chain_size;
+
+    return S2N_SUCCESS;
+}
