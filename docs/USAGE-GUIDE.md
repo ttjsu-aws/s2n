@@ -1412,6 +1412,14 @@ int s2n_get_cert_der(struct s2n_cert *cert, uint8_t *out_cert_der, uint32_t *cer
 
 **s2n_get_cert_der** gets the certificate `cert` in .der format which is returned in the buffer `out_cert_der`, `cert_len` represents the length of the certificate. 
 
+### s2n\_connection\_get_peer\_cert\_chain
+
+```c
+int s2n_connection_get_peer_cert_chain(struct s2n_connection *conn, struct s2n_cert_chain_and_key *s2n_cert_chain_and_key);
+```
+
+**s2n_connection_get_peer_cert_chain** gets the validated peer certificate from the s2n connection object.
+
 ### Session Resumption Related calls
 
 ```c

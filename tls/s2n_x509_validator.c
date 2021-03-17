@@ -391,21 +391,20 @@ s2n_cert_validation_code s2n_x509_validator_validate_cert_chain(struct s2n_x509_
         validator->cert_chain_validated = X509_STORE_CTX_get1_chain(validator->store_ctx);
     }
 
-    if (validator->state == VALIDATED) {
-        DEFER_CLEANUP(struct s2n_stuffer cert_chain_out_stuffer = {0}, s2n_stuffer_free);
-        POSIX_GUARD(s2n_stuffer_growable_alloc(&cert_chain_out_stuffer, 0));
+    if (!validator->skip_cert_validation) {
+        DEFER_CLEANUP(struct s2n_stuffer cert_chain_out_stuffer = { 0 }, s2n_stuffer_free);
+        POSIX_GUARD(s2n_stuffer_alloc(&cert_chain_out_stuffer, cert_chain_len));
 
         for (size_t cert_idx = 0; cert_idx < sk_X509_num(validator->cert_chain_validated); cert_idx++) {
             X509 *cert = sk_X509_value(validator->cert_chain_validated, cert_idx);
-            struct s2n_blob asn1cert = { 0 };
-            int encoded_data_len = i2d_X509(cert, &asn1cert.data);
+            uint8_t *cert_data = NULL;
+            int encoded_data_len = i2d_X509(cert, &cert_data);
             POSIX_ENSURE_GT(encoded_data_len, 0);
-            asn1cert.size = encoded_data_len;
-            POSIX_GUARD(s2n_stuffer_write_uint24(&cert_chain_out_stuffer, asn1cert.size));
-            POSIX_GUARD(s2n_stuffer_write_bytes(&cert_chain_out_stuffer, asn1cert.data, asn1cert.size));
-            OPENSSL_free(asn1cert.data);
+            POSIX_GUARD(s2n_stuffer_write_uint24(&cert_chain_out_stuffer, encoded_data_len));
+            POSIX_GUARD(s2n_stuffer_write_bytes(&cert_chain_out_stuffer, cert_data, encoded_data_len));
+            OPENSSL_free(cert_data);
         }
-
+        conn->secure.peer_cert_chain.size = s2n_stuffer_data_available(&cert_chain_out_stuffer);
         POSIX_GUARD(s2n_dup(&cert_chain_out_stuffer.blob, &conn->secure.peer_cert_chain));
     } else {
         POSIX_GUARD(s2n_dup(&cert_chain_blob, &conn->secure.peer_cert_chain));
