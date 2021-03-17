@@ -1549,5 +1549,54 @@ int main(int argc, char **argv) {
         s2n_x509_trust_store_wipe(&trust_store);
     }
 
+    /* Test s2n_connection_get_peer_cert_chain */
+    {
+        struct s2n_connection *conn = s2n_connection_new(S2N_CLIENT);
+        EXPECT_NOT_NULL(conn);
+
+        struct s2n_cert_chain_and_key *cert_chain_and_key = s2n_cert_chain_and_key_new();
+        EXPECT_NOT_NULL(cert_chain_and_key);
+
+        /* Safety checks */
+        {
+            EXPECT_FAILURE_WITH_ERRNO(s2n_connection_get_peer_cert_chain(NULL, cert_chain_and_key), S2N_ERR_NULL);
+            EXPECT_FAILURE_WITH_ERRNO(s2n_connection_get_peer_cert_chain(conn, NULL), S2N_ERR_NULL);
+        }
+
+        struct s2n_x509_trust_store trust_store =  { 0 };
+        s2n_x509_trust_store_init_empty(&trust_store);
+        EXPECT_EQUAL(0, s2n_x509_trust_store_from_ca_file(&trust_store, S2N_DEFAULT_TEST_CERT_CHAIN, NULL));
+        struct host_verify_data verify_data = { .callback_invoked = 0, .found_name = 0, .name = NULL };
+        uint8_t cert_chain_pem[S2N_MAX_TEST_PEM_SIZE];
+        EXPECT_SUCCESS(s2n_read_test_pem(S2N_DEFAULT_TEST_CERT_CHAIN, (char *) cert_chain_pem, S2N_MAX_TEST_PEM_SIZE));
+        struct s2n_stuffer chain_stuffer =  { 0 };
+        uint32_t chain_len = write_pem_file_to_stuffer_as_chain(&chain_stuffer, (const char *) cert_chain_pem, S2N_TLS12);
+        EXPECT_TRUE(chain_len > 0);
+        uint8_t *chain_data = s2n_stuffer_raw_read(&chain_stuffer, (uint32_t) chain_len);
+
+        EXPECT_SUCCESS(s2n_connection_set_verify_host_callback(conn, verify_host_accept_everything, &verify_data));
+
+        struct s2n_pkey public_key_out = { 0 };
+        EXPECT_SUCCESS(s2n_pkey_zero_init(&public_key_out));
+        s2n_pkey_type pkey_type = { 0 };
+
+        struct s2n_x509_validator validator = { 0 };
+        s2n_x509_validator_init(&validator, &trust_store, 1);
+        EXPECT_NULL(conn->secure.peer_cert_chain.data);
+        EXPECT_EQUAL(S2N_CERT_OK, s2n_x509_validator_validate_cert_chain(&validator, conn, chain_data, chain_len,
+                                                                         &pkey_type, &public_key_out));
+        EXPECT_NOT_NULL(conn->secure.peer_cert_chain.data);
+        EXPECT_EQUAL(1, verify_data.callback_invoked);
+
+        EXPECT_SUCCESS(s2n_connection_get_peer_cert_chain(conn, cert_chain_and_key));
+
+        EXPECT_SUCCESS(s2n_pkey_free(&public_key_out));
+        s2n_x509_validator_wipe(&validator);
+        EXPECT_SUCCESS(s2n_stuffer_free(&chain_stuffer));
+        s2n_x509_trust_store_wipe(&trust_store);
+        EXPECT_SUCCESS(s2n_cert_chain_and_key_free(cert_chain_and_key));
+        EXPECT_SUCCESS(s2n_connection_free(conn));       
+    }
+
     END_TEST();
 }

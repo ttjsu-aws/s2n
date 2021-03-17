@@ -477,6 +477,9 @@ S2N_API
 extern int s2n_get_cert_der(struct s2n_cert *cert, uint8_t **out_cert_der, uint32_t *cert_length);
 
 S2N_API
+extern int s2n_connection_get_peer_cert_chain(struct s2n_connection *conn, struct s2n_cert_chain_and_key *s2n_cert_chain_and_key);
+
+S2N_API
 extern uint64_t s2n_connection_get_wire_bytes_in(struct s2n_connection *conn);
 S2N_API
 extern uint64_t s2n_connection_get_wire_bytes_out(struct s2n_connection *conn);

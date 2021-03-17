@@ -1392,3 +1392,41 @@ int s2n_connection_set_keyshare_by_name_for_testing(struct s2n_connection *conn,
 
     POSIX_BAIL(S2N_ERR_ECDHE_UNSUPPORTED_CURVE);
 }
+
+int s2n_connection_get_peer_cert_chain(struct s2n_connection *conn, struct s2n_cert_chain_and_key *cert_chain_and_key)
+{
+    POSIX_ENSURE_REF(conn);
+    POSIX_ENSURE_REF(cert_chain_and_key);
+    POSIX_ENSURE_REF(conn->secure.peer_cert_chain.data);
+
+    DEFER_CLEANUP(struct s2n_stuffer cert_chain_stuffer = { 0 }, s2n_stuffer_free);
+    POSIX_GUARD(s2n_stuffer_init(&cert_chain_stuffer, &conn->secure.peer_cert_chain));
+    POSIX_GUARD(s2n_stuffer_skip_write(&cert_chain_stuffer, &conn->secure.peer_cert_chain.size));
+
+    struct s2n_cert_chain *cert_chain = cert_chain_and_key->cert_chain;
+    struct s2n_cert **insert = &cert_chain->head;
+
+    while (s2n_stuffer_data_available(&cert_chain_stuffer) > 0) {
+        uint32_t cert_size = 0;
+        POSIX_GUARD(s2n_stuffer_read_uint24(&cert_chain_stuffer, &cert_size));
+        uint8_t *cert_data = s2n_stuffer_raw_read(&cert_chain_stuffer, cert_size);
+        POSIX_ENSURE_REF(cert_data);
+
+        struct s2n_cert *new_node = NULL;
+        struct s2n_blob mem = { 0 };
+        POSIX_GUARD(s2n_realloc(&mem, sizeof(struct s2n_cert)));
+        new_node = (struct s2n_cert *)(void *)mem.data;
+        POSIX_GUARD(s2n_realloc(&new_node->raw, cert_size));
+        POSIX_CHECKED_MEMCPY(new_node->raw.data, cert_data, cert_size);
+
+        new_node->next = NULL;
+        *insert = new_node;
+        insert = &new_node->next;
+    }
+
+    /* Leftover data at this point means we have a malformed peer cert chain.
+     * Be conservative and fail. */
+    POSIX_ENSURE(s2n_stuffer_data_available(&cert_chain_stuffer) == 0, S2N_ERR_INVALID_STATE);
+
+    return S2N_SUCCESS;
+}
