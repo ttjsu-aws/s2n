@@ -20,6 +20,7 @@
 #include <poll.h>
 #include <netdb.h>
 
+#include <ctype.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
@@ -93,6 +94,11 @@ void usage()
                     "    By default, the client will generate keyshares for all curves present in the ecc_preferences list.\n");
     fprintf(stderr, "  -L --key-log <path>\n");
     fprintf(stderr, "    Enable NSS key logging into the provided path\n");
+    fprintf(stderr, "  --psk <psk-identity,psk-secret,psk-hmac-alg> \n"
+                    "    A comma separated list of psk paramaters specified in an order namely: psk_identity, psk_secret and psk_hmac_alg.\n"
+                    "    Note: psk_identity and psk_secret are required values and psk_hmac_alg is optional. The default value for psk_hmac_alg is S2N_PSK_HMAC_SHA256.\n"
+                    "    There are no whitespaces allowed before of after the comma.\n"
+                    "    Ex: --psk psk_id,psk_secret,S2N_PSK_HMAC_SHA256 --psk psk_id2,psk_secret2 --psk shared_id,shared_secret,S2N_PSK_HMAC_SHA384.\n");
     fprintf(stderr, "\n");
     exit(1);
 }
@@ -258,8 +264,15 @@ int main(int argc, char *const *argv)
     char keyshares[S2N_ECC_EVP_SUPPORTED_CURVES_COUNT][S2N_MAX_ECC_CURVE_NAME_LENGTH];
     char *input = NULL;
     char *token = NULL;
+    size_t idx = 0;
     const char *key_log_path = NULL;
     FILE *key_log_file = NULL;
+    size_t psk_identity_count = 0;
+    char psk_identity_list [UINT16_MAX][S2N_MAX_NUM_OF_PSKS_IN_LIST];
+    size_t psk_secret_count = 0;
+   char psk_secret_list[UINT16_MAX][S2N_MAX_NUM_OF_PSKS_IN_LIST];
+    size_t psk_hmac_count = 0;
+    char psk_hmac_list[UINT16_MAX][S2N_MAX_NUM_OF_PSKS_IN_LIST];
 
     static struct option long_options[] = {
         {"alpn", required_argument, 0, 'a'},
@@ -283,12 +296,13 @@ int main(int argc, char *const *argv)
         {"keyshares", required_argument, 0, 'K'},
         {"non-blocking", no_argument, 0, 'B'},
         {"key-log", required_argument, 0, 'L'},
+        {"psk", required_argument, 0, 'P'},
         { 0 },
     };
 
     while (1) {
         int option_index = 0;
-        int c = getopt_long(argc, argv, "a:c:ehn:sf:d:l:k:D:t:irTCK:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "a:c:ehn:sf:d:l:k:D:P:t:irTCK:P:", long_options, &option_index);
         if (c == -1) {
             break;
         }
@@ -369,6 +383,29 @@ int main(int argc, char *const *argv)
             break;
         case 'L':
             key_log_path = optarg;
+            break;
+        case 'P':
+            idx = 0;
+            if (psk_hmac_count < psk_identity_count) {
+                strcpy(psk_hmac_list[psk_hmac_count++], "S2N_PSK_HMAC_DEFAULT");
+                eq_check(psk_identity_count, psk_hmac_count);
+            }
+            for (token = strtok(optarg, ","); token != NULL; token = strtok(NULL, ","), idx++) {
+                switch (idx) { 
+                    case 0: 
+                        strcpy(psk_identity_list[psk_identity_count++], token);
+                        break;
+                    case 1: 
+                        strcpy(psk_secret_list[psk_secret_count++], token);
+                        break;
+                    case 2:
+                        strcpy(psk_hmac_list[psk_hmac_count++], token);
+                        break;
+                    default: 
+                        break;
+                }
+            }
+            eq_check(psk_identity_count, psk_secret_count);
             break;
         case '?':
         default:
@@ -508,6 +545,30 @@ int main(int argc, char *const *argv)
         /* Update session state in connection if exists */
         if (session_state_length > 0) {
             GUARD_EXIT(s2n_connection_set_session(conn, session_state, session_state_length), "Error setting session state in connection");
+        }
+
+        for (size_t i = 0; i < psk_identity_count; i++) {
+            DEFER_CLEANUP(struct s2n_psk *input_psk = s2n_external_psk_new(), s2n_psk_free);
+            unsigned char *psk_secret = NULL;
+            long psk_secret_length = 0; 
+            /* Default HMAC algorithm is S2N_PSK_HMAC_SHA256 */ 
+            s2n_psk_hmac input_psk_hmac = S2N_PSK_HMAC_SHA256;
+            if (strcmp(psk_hmac_list[i], "S2N_PSK_HMAC_DEFAULT") != 0) {
+                GUARD_EXIT(get_s2n_psk_hmac(&input_psk_hmac, psk_hmac_list[i]), "Invalid psk hmac algorithm");
+            }
+            GUARD_EXIT(s2n_psk_set_hmac(input_psk, input_psk_hmac), "Error setting psk hmac algorithm");
+
+            GUARD_EXIT(s2n_psk_set_identity(input_psk, (uint8_t *)psk_identity_list[i],
+                                            strlen(psk_identity_list[i])),
+                                            "Error setting psk identity");
+
+            /* Convert the psk secret from raw str to hexstr format */
+            psk_secret = OPENSSL_hexstr2buf(psk_secret_list[i], &psk_secret_length);
+            notnull_check(psk_secret);
+            GUARD_EXIT(s2n_psk_set_secret(input_psk, (const uint8_t *)psk_secret, psk_secret_length), "Error setting psk secret");
+
+            GUARD_EXIT(s2n_connection_append_psk(conn, input_psk), "Error appending psk");
+            OPENSSL_free(psk_secret);
         }
 
         /* See echo.c */
