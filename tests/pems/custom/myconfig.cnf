@@ -1,0 +1,14 @@
+[req]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+
+[ req_distinguished_name ]
+countryName			= US
+stateOrProvinceName		= WA
+localityName			= Seattle
+0.organizationName		= Amazon
+commonName			= test_cert
+emailAddress			= test@email.com
+
+[v3_req]
+1.2.3.4.5.6.7.8=ASN1:UTF8String:IP Address:12.345.67.890

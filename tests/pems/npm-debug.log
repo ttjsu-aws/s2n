@@ -1,0 +1,401 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'install', 'wopenssl' ]
+2 info using npm@3.5.2
+3 info using node@v8.10.0
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly fetchPackageMetaData wopenssl
+8 silly fetchNamedPackageData wopenssl
+9 silly mapToRegistry name wopenssl
+10 silly mapToRegistry using default registry
+11 silly mapToRegistry registry https://registry.npmjs.org/
+12 silly mapToRegistry uri https://registry.npmjs.org/wopenssl
+13 verbose request uri https://registry.npmjs.org/wopenssl
+14 verbose request no auth needed
+15 info attempt registry request try #1 at 11:18:06 PM
+16 verbose request id 4e832756b12c976e
+17 verbose etag W/"1b976871db830aea034b5a3d51b507a7"
+18 verbose lastModified Sun, 27 May 2018 22:14:36 GMT
+19 http request GET https://registry.npmjs.org/wopenssl
+20 http 304 https://registry.npmjs.org/wopenssl
+21 verbose headers { date: 'Mon, 29 Mar 2021 23:18:06 GMT',
+21 verbose headers   connection: 'keep-alive',
+21 verbose headers   'set-cookie':
+21 verbose headers    [ '__cfduid=d68eb1d2b70b95540990d6b71a28163d91617059886; expires=Wed, 28-Apr-21 23:18:06 GMT; path=/; domain=.npmjs.org; HttpOnly; SameSite=Lax' ],
+21 verbose headers   'cf-ray': '637cd0bffd76138e-SEA',
+21 verbose headers   age: '56',
+21 verbose headers   'cache-control': 'public, max-age=300',
+21 verbose headers   etag: '"1b976871db830aea034b5a3d51b507a7"',
+21 verbose headers   'last-modified': 'Sun, 27 May 2018 22:14:36 GMT',
+21 verbose headers   vary: 'Accept-Encoding',
+21 verbose headers   'cf-cache-status': 'HIT',
+21 verbose headers   'cf-request-id': '0921e0cbfd0000138ebd013000000001',
+21 verbose headers   'expect-ct': 'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
+21 verbose headers   server: 'cloudflare' }
+22 silly get cb [ 304,
+22 silly get   { date: 'Mon, 29 Mar 2021 23:18:06 GMT',
+22 silly get     connection: 'keep-alive',
+22 silly get     'set-cookie':
+22 silly get      [ '__cfduid=d68eb1d2b70b95540990d6b71a28163d91617059886; expires=Wed, 28-Apr-21 23:18:06 GMT; path=/; domain=.npmjs.org; HttpOnly; SameSite=Lax' ],
+22 silly get     'cf-ray': '637cd0bffd76138e-SEA',
+22 silly get     age: '56',
+22 silly get     'cache-control': 'public, max-age=300',
+22 silly get     etag: '"1b976871db830aea034b5a3d51b507a7"',
+22 silly get     'last-modified': 'Sun, 27 May 2018 22:14:36 GMT',
+22 silly get     vary: 'Accept-Encoding',
+22 silly get     'cf-cache-status': 'HIT',
+22 silly get     'cf-request-id': '0921e0cbfd0000138ebd013000000001',
+22 silly get     'expect-ct': 'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
+22 silly get     server: 'cloudflare' } ]
+23 verbose etag https://registry.npmjs.org/wopenssl from cache
+24 verbose get saving wopenssl to /home/ubuntu/.npm/registry.npmjs.org/wopenssl/.cache.json
+25 silly install normalizeTree
+26 silly loadCurrentTree Finishing
+27 silly loadIdealTree Starting
+28 silly install loadIdealTree
+29 silly cloneCurrentTree Starting
+30 silly install cloneCurrentTreeToIdealTree
+31 silly cloneCurrentTree Finishing
+32 silly loadShrinkwrap Starting
+33 silly install loadShrinkwrap
+34 silly loadShrinkwrap Finishing
+35 silly loadAllDepsIntoIdealTree Starting
+36 silly install loadAllDepsIntoIdealTree
+37 silly resolveWithNewModule wopenssl@0.3.1 checking installable status
+38 silly cache add args [ 'wopenssl', null ]
+39 verbose cache add spec wopenssl
+40 silly cache add parsed spec Result {
+40 silly cache add   raw: 'wopenssl',
+40 silly cache add   scope: null,
+40 silly cache add   name: 'wopenssl',
+40 silly cache add   rawSpec: '',
+40 silly cache add   spec: 'latest',
+40 silly cache add   type: 'tag' }
+41 silly addNamed wopenssl@latest
+42 verbose addNamed "latest" is being treated as a dist-tag for wopenssl
+43 info addNameTag [ 'wopenssl', 'latest' ]
+44 silly mapToRegistry name wopenssl
+45 silly mapToRegistry using default registry
+46 silly mapToRegistry registry https://registry.npmjs.org/
+47 silly mapToRegistry uri https://registry.npmjs.org/wopenssl
+48 verbose addNameTag registry:https://registry.npmjs.org/wopenssl not in flight; fetching
+49 verbose get https://registry.npmjs.org/wopenssl not expired, no request
+50 silly addNameTag next cb for wopenssl with tag latest
+51 silly addNamed wopenssl@0.3.1
+52 verbose addNamed "0.3.1" is a plain semver version for wopenssl
+53 silly cache afterAdd wopenssl@0.3.1
+54 verbose afterAdd /home/ubuntu/.npm/wopenssl/0.3.1/package/package.json not in flight; writing
+55 verbose afterAdd /home/ubuntu/.npm/wopenssl/0.3.1/package/package.json written
+56 silly fetchNamedPackageData nan
+57 silly mapToRegistry name nan
+58 silly mapToRegistry using default registry
+59 silly mapToRegistry registry https://registry.npmjs.org/
+60 silly mapToRegistry uri https://registry.npmjs.org/nan
+61 verbose request uri https://registry.npmjs.org/nan
+62 verbose request no auth needed
+63 info attempt registry request try #1 at 11:18:06 PM
+64 verbose etag W/"ac38f6c9400be015a896aa94515b9385"
+65 verbose lastModified Tue, 13 Oct 2020 12:49:58 GMT
+66 http request GET https://registry.npmjs.org/nan
+67 http 304 https://registry.npmjs.org/nan
+68 verbose headers { date: 'Mon, 29 Mar 2021 23:18:06 GMT',
+68 verbose headers   connection: 'keep-alive',
+68 verbose headers   'set-cookie':
+68 verbose headers    [ '__cfduid=d68eb1d2b70b95540990d6b71a28163d91617059886; expires=Wed, 28-Apr-21 23:18:06 GMT; path=/; domain=.npmjs.org; HttpOnly; SameSite=Lax' ],
+68 verbose headers   'cf-ray': '637cd0c09e9b138e-SEA',
+68 verbose headers   age: '3422',
+68 verbose headers   'cache-control': 'public, max-age=300',
+68 verbose headers   etag: '"ac38f6c9400be015a896aa94515b9385"',
+68 verbose headers   'last-modified': 'Tue, 13 Oct 2020 12:49:58 GMT',
+68 verbose headers   vary: 'Accept-Encoding',
+68 verbose headers   'cf-cache-status': 'HIT',
+68 verbose headers   'cf-request-id': '0921e0cc600000138ed5912000000001',
+68 verbose headers   'expect-ct': 'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
+68 verbose headers   server: 'cloudflare' }
+69 silly get cb [ 304,
+69 silly get   { date: 'Mon, 29 Mar 2021 23:18:06 GMT',
+69 silly get     connection: 'keep-alive',
+69 silly get     'set-cookie':
+69 silly get      [ '__cfduid=d68eb1d2b70b95540990d6b71a28163d91617059886; expires=Wed, 28-Apr-21 23:18:06 GMT; path=/; domain=.npmjs.org; HttpOnly; SameSite=Lax' ],
+69 silly get     'cf-ray': '637cd0c09e9b138e-SEA',
+69 silly get     age: '3422',
+69 silly get     'cache-control': 'public, max-age=300',
+69 silly get     etag: '"ac38f6c9400be015a896aa94515b9385"',
+69 silly get     'last-modified': 'Tue, 13 Oct 2020 12:49:58 GMT',
+69 silly get     vary: 'Accept-Encoding',
+69 silly get     'cf-cache-status': 'HIT',
+69 silly get     'cf-request-id': '0921e0cc600000138ed5912000000001',
+69 silly get     'expect-ct': 'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
+69 silly get     server: 'cloudflare' } ]
+70 verbose etag https://registry.npmjs.org/nan from cache
+71 verbose get saving nan to /home/ubuntu/.npm/registry.npmjs.org/nan/.cache.json
+72 silly resolveWithNewModule nan@2.2.0 checking installable status
+73 silly cache add args [ 'nan@2.2.0', null ]
+74 verbose cache add spec nan@2.2.0
+75 silly cache add parsed spec Result {
+75 silly cache add   raw: 'nan@2.2.0',
+75 silly cache add   scope: null,
+75 silly cache add   name: 'nan',
+75 silly cache add   rawSpec: '2.2.0',
+75 silly cache add   spec: '2.2.0',
+75 silly cache add   type: 'version' }
+76 silly addNamed nan@2.2.0
+77 verbose addNamed "2.2.0" is a plain semver version for nan
+78 silly mapToRegistry name nan
+79 silly mapToRegistry using default registry
+80 silly mapToRegistry registry https://registry.npmjs.org/
+81 silly mapToRegistry uri https://registry.npmjs.org/nan
+82 verbose addNameVersion registry:https://registry.npmjs.org/nan not in flight; fetching
+83 verbose get https://registry.npmjs.org/nan not expired, no request
+84 silly cache afterAdd nan@2.2.0
+85 verbose afterAdd /home/ubuntu/.npm/nan/2.2.0/package/package.json not in flight; writing
+86 verbose afterAdd /home/ubuntu/.npm/nan/2.2.0/package/package.json written
+87 silly loadAllDepsIntoIdealTree Finishing
+88 silly idealTree:prePrune pems
+88 silly idealTree:prePrune ├── nan@2.2.0
+88 silly idealTree:prePrune └── wopenssl@0.3.1
+89 silly loadIdealTree Finishing
+90 silly currentTree pems
+91 silly idealTree pems
+91 silly idealTree ├── nan@2.2.0
+91 silly idealTree └── wopenssl@0.3.1
+92 silly generateActionsToTake Starting
+93 silly install generateActionsToTake
+94 silly generateActionsToTake Finishing
+95 silly diffTrees action count 2
+96 silly diffTrees add nan@2.2.0
+97 silly diffTrees add wopenssl@0.3.1
+98 silly decomposeActions action count 16
+99 silly decomposeActions fetch nan@2.2.0
+100 silly decomposeActions extract nan@2.2.0
+101 silly decomposeActions test nan@2.2.0
+102 silly decomposeActions preinstall nan@2.2.0
+103 silly decomposeActions build nan@2.2.0
+104 silly decomposeActions install nan@2.2.0
+105 silly decomposeActions postinstall nan@2.2.0
+106 silly decomposeActions finalize nan@2.2.0
+107 silly decomposeActions fetch wopenssl@0.3.1
+108 silly decomposeActions extract wopenssl@0.3.1
+109 silly decomposeActions test wopenssl@0.3.1
+110 silly decomposeActions preinstall wopenssl@0.3.1
+111 silly decomposeActions build wopenssl@0.3.1
+112 silly decomposeActions install wopenssl@0.3.1
+113 silly decomposeActions postinstall wopenssl@0.3.1
+114 silly decomposeActions finalize wopenssl@0.3.1
+115 silly executeActions Starting
+116 silly install executeActions
+117 silly doSerial global-install 0
+118 silly doParallel fetch 2
+119 verbose lock using /home/ubuntu/.npm/_locks/staging-979ab528edf20762.lock for /home/ubuntu/s2n/tests/pems/node_modules/.staging
+120 silly doParallel extract 2
+121 silly extract nan@2.2.0
+122 silly extract wopenssl@0.3.1
+123 verbose unbuild node_modules/.staging/nan-3a272677
+124 verbose unbuild node_modules/.staging/wopenssl-81293aad
+125 silly gentlyRm /home/ubuntu/s2n/tests/pems/node_modules/.staging/nan-3a272677 is being purged from base /home/ubuntu/s2n/tests/pems
+126 verbose gentlyRm don't care about contents; nuking /home/ubuntu/s2n/tests/pems/node_modules/.staging/nan-3a272677
+127 silly gentlyRm /home/ubuntu/s2n/tests/pems/node_modules/.staging/wopenssl-81293aad is being purged from base /home/ubuntu/s2n/tests/pems
+128 verbose gentlyRm don't care about contents; nuking /home/ubuntu/s2n/tests/pems/node_modules/.staging/wopenssl-81293aad
+129 verbose tar unpack /home/ubuntu/.npm/nan/2.2.0/package.tgz
+130 verbose tar unpacking to /home/ubuntu/s2n/tests/pems/node_modules/.staging/nan-3a272677
+131 silly gentlyRm /home/ubuntu/s2n/tests/pems/node_modules/.staging/nan-3a272677 is being purged
+132 verbose gentlyRm don't care about contents; nuking /home/ubuntu/s2n/tests/pems/node_modules/.staging/nan-3a272677
+133 verbose tar unpack /home/ubuntu/.npm/wopenssl/0.3.1/package.tgz
+134 verbose tar unpacking to /home/ubuntu/s2n/tests/pems/node_modules/.staging/wopenssl-81293aad
+135 silly gentlyRm /home/ubuntu/s2n/tests/pems/node_modules/.staging/wopenssl-81293aad is being purged
+136 verbose gentlyRm don't care about contents; nuking /home/ubuntu/s2n/tests/pems/node_modules/.staging/wopenssl-81293aad
+137 silly gunzTarPerm modes [ '755', '644' ]
+138 silly gunzTarPerm modes [ '755', '644' ]
+139 silly gunzTarPerm extractEntry package.json
+140 silly gunzTarPerm modified mode [ 'package.json', 436, 420 ]
+141 silly gunzTarPerm extractEntry package.json
+142 silly gunzTarPerm extractEntry README.md
+143 silly gunzTarPerm modified mode [ 'README.md', 436, 420 ]
+144 silly gunzTarPerm extractEntry include_dirs.js
+145 silly gunzTarPerm modified mode [ 'include_dirs.js', 436, 420 ]
+146 silly gunzTarPerm extractEntry .npmignore
+147 silly gunzTarPerm extractEntry README.md
+148 silly gunzTarPerm extractEntry nan_converters.h
+149 silly gunzTarPerm modified mode [ 'nan_converters.h', 436, 420 ]
+150 silly gunzTarPerm extractEntry LICENSE.md
+151 silly gunzTarPerm modified mode [ 'LICENSE.md', 436, 420 ]
+152 silly gunzTarPerm extractEntry .dntrc
+153 silly gunzTarPerm modified mode [ '.dntrc', 436, 420 ]
+154 silly gunzTarPerm extractEntry index.js
+155 silly gunzTarPerm extractEntry build/Makefile
+156 silly gunzTarPerm extractEntry appveyor.yml
+157 silly gunzTarPerm modified mode [ 'appveyor.yml', 436, 420 ]
+158 silly gunzTarPerm extractEntry build/Release/.deps/Release/obj.target/wopenssl/src/addon.o.d.raw
+159 silly gunzTarPerm extractEntry doc/new.md
+160 silly gunzTarPerm modified mode [ 'doc/new.md', 436, 420 ]
+161 silly gunzTarPerm extractEntry doc/.build.sh
+162 silly gunzTarPerm modified mode [ 'doc/.build.sh', 509, 493 ]
+163 silly gunzTarPerm extractEntry build/binding.Makefile
+164 silly gunzTarPerm extractEntry build/wopenssl.target.mk
+165 silly gunzTarPerm extractEntry doc/buffers.md
+166 silly gunzTarPerm modified mode [ 'doc/buffers.md', 436, 420 ]
+167 silly gunzTarPerm extractEntry doc/callback.md
+168 silly gunzTarPerm modified mode [ 'doc/callback.md', 436, 420 ]
+169 silly gunzTarPerm extractEntry binding.gyp
+170 silly gunzTarPerm extractEntry binding.gyp.old~
+171 silly gunzTarPerm extractEntry doc/converters.md
+172 silly gunzTarPerm modified mode [ 'doc/converters.md', 436, 420 ]
+173 silly gunzTarPerm extractEntry doc/errors.md
+174 silly gunzTarPerm modified mode [ 'doc/errors.md', 436, 420 ]
+175 silly gunzTarPerm extractEntry doc/maybe_types.md
+176 silly gunzTarPerm modified mode [ 'doc/maybe_types.md', 436, 420 ]
+177 silly gunzTarPerm extractEntry doc/methods.md
+178 silly gunzTarPerm modified mode [ 'doc/methods.md', 436, 420 ]
+179 silly gunzTarPerm extractEntry doc/asyncworker.md
+180 silly gunzTarPerm modified mode [ 'doc/asyncworker.md', 436, 420 ]
+181 silly gunzTarPerm extractEntry doc/node_misc.md
+182 silly gunzTarPerm modified mode [ 'doc/node_misc.md', 436, 420 ]
+183 silly gunzTarPerm extractEntry include/addon.h
+184 silly gunzTarPerm extractEntry include/pkcs12.h
+185 silly gunzTarPerm extractEntry doc/object_wrappers.md
+186 silly gunzTarPerm modified mode [ 'doc/object_wrappers.md', 436, 420 ]
+187 silly gunzTarPerm extractEntry doc/persistent.md
+188 silly gunzTarPerm modified mode [ 'doc/persistent.md', 436, 420 ]
+189 silly gunzTarPerm extractEntry doc/scopes.md
+190 silly gunzTarPerm modified mode [ 'doc/scopes.md', 436, 420 ]
+191 silly gunzTarPerm extractEntry include/x509.h
+192 silly gunzTarPerm extractEntry .travis.yml
+193 silly gunzTarPerm extractEntry doc/script.md
+194 silly gunzTarPerm modified mode [ 'doc/script.md', 436, 420 ]
+195 silly gunzTarPerm extractEntry doc/string_bytes.md
+196 silly gunzTarPerm modified mode [ 'doc/string_bytes.md', 436, 420 ]
+197 silly gunzTarPerm extractEntry src/addon.cc
+198 silly gunzTarPerm extractEntry src/pkcs12.cc
+199 silly gunzTarPerm extractEntry doc/v8_internals.md
+200 silly gunzTarPerm modified mode [ 'doc/v8_internals.md', 436, 420 ]
+201 silly gunzTarPerm extractEntry doc/v8_misc.md
+202 silly gunzTarPerm modified mode [ 'doc/v8_misc.md', 436, 420 ]
+203 silly gunzTarPerm extractEntry src/tmp
+204 silly gunzTarPerm extractEntry src/x509.cc
+205 silly gunzTarPerm extractEntry nan.h
+206 silly gunzTarPerm modified mode [ 'nan.h', 436, 420 ]
+207 silly gunzTarPerm extractEntry nan_callbacks.h
+208 silly gunzTarPerm modified mode [ 'nan_callbacks.h', 436, 420 ]
+209 silly gunzTarPerm extractEntry #.travis.yml#
+210 silly gunzTarPerm extractEntry nan_callbacks_12_inl.h
+211 silly gunzTarPerm modified mode [ 'nan_callbacks_12_inl.h', 436, 420 ]
+212 silly gunzTarPerm extractEntry nan_callbacks_pre_12_inl.h
+213 silly gunzTarPerm modified mode [ 'nan_callbacks_pre_12_inl.h', 436, 420 ]
+214 silly gunzTarPerm extractEntry nan_converters_43_inl.h
+215 silly gunzTarPerm modified mode [ 'nan_converters_43_inl.h', 436, 420 ]
+216 silly gunzTarPerm extractEntry nan_converters_pre_43_inl.h
+217 silly gunzTarPerm modified mode [ 'nan_converters_pre_43_inl.h', 436, 420 ]
+218 silly gunzTarPerm extractEntry nan_implementation_12_inl.h
+219 silly gunzTarPerm modified mode [ 'nan_implementation_12_inl.h', 436, 420 ]
+220 silly gunzTarPerm extractEntry nan_implementation_pre_12_inl.h
+221 silly gunzTarPerm modified mode [ 'nan_implementation_pre_12_inl.h', 436, 420 ]
+222 silly gunzTarPerm extractEntry nan_maybe_43_inl.h
+223 silly gunzTarPerm modified mode [ 'nan_maybe_43_inl.h', 436, 420 ]
+224 silly gunzTarPerm extractEntry nan_maybe_pre_43_inl.h
+225 silly gunzTarPerm modified mode [ 'nan_maybe_pre_43_inl.h', 436, 420 ]
+226 silly gunzTarPerm extractEntry nan_new.h
+227 silly gunzTarPerm modified mode [ 'nan_new.h', 436, 420 ]
+228 silly gunzTarPerm extractEntry nan_object_wrap.h
+229 silly gunzTarPerm modified mode [ 'nan_object_wrap.h', 436, 420 ]
+230 silly gunzTarPerm extractEntry nan_persistent_12_inl.h
+231 silly gunzTarPerm modified mode [ 'nan_persistent_12_inl.h', 436, 420 ]
+232 silly gunzTarPerm extractEntry nan_persistent_pre_12_inl.h
+233 silly gunzTarPerm modified mode [ 'nan_persistent_pre_12_inl.h', 436, 420 ]
+234 silly gunzTarPerm extractEntry nan_string_bytes.h
+235 silly gunzTarPerm modified mode [ 'nan_string_bytes.h', 436, 420 ]
+236 silly gunzTarPerm extractEntry nan_typedarray_contents.h
+237 silly gunzTarPerm modified mode [ 'nan_typedarray_contents.h', 436, 420 ]
+238 silly gunzTarPerm extractEntry nan_weak.h
+239 silly gunzTarPerm modified mode [ 'nan_weak.h', 436, 420 ]
+240 silly gunzTarPerm extractEntry CHANGELOG.md
+241 silly gunzTarPerm modified mode [ 'CHANGELOG.md', 436, 420 ]
+242 silly gunzTarPerm extractEntry tools/package.json
+243 silly gunzTarPerm modified mode [ 'tools/package.json', 436, 420 ]
+244 silly gunzTarPerm extractEntry tools/README.md
+245 silly gunzTarPerm modified mode [ 'tools/README.md', 436, 420 ]
+246 silly gunzTarPerm extractEntry tools/1to2.js
+247 silly gunzTarPerm modified mode [ 'tools/1to2.js', 509, 493 ]
+248 silly gentlyRm /home/ubuntu/s2n/tests/pems/node_modules/.staging/wopenssl-81293aad/node_modules is being purged
+249 verbose gentlyRm don't care about contents; nuking /home/ubuntu/s2n/tests/pems/node_modules/.staging/wopenssl-81293aad/node_modules
+250 silly gentlyRm /home/ubuntu/s2n/tests/pems/node_modules/.staging/nan-3a272677/node_modules is being purged
+251 verbose gentlyRm don't care about contents; nuking /home/ubuntu/s2n/tests/pems/node_modules/.staging/nan-3a272677/node_modules
+252 silly doParallel preinstall 2
+253 silly preinstall nan@2.2.0 /home/ubuntu/s2n/tests/pems/node_modules/.staging/nan-3a272677
+254 info lifecycle nan@2.2.0~preinstall: nan@2.2.0
+255 silly preinstall wopenssl@0.3.1 /home/ubuntu/s2n/tests/pems/node_modules/.staging/wopenssl-81293aad
+256 info lifecycle wopenssl@0.3.1~preinstall: wopenssl@0.3.1
+257 silly lifecycle nan@2.2.0~preinstall: no script for preinstall, continuing
+258 silly lifecycle wopenssl@0.3.1~preinstall: no script for preinstall, continuing
+259 silly doReverseSerial remove 0
+260 silly doSerial move 0
+261 silly doSerial finalize 2
+262 silly finalize /home/ubuntu/s2n/tests/pems/node_modules/nan
+263 silly finalize /home/ubuntu/s2n/tests/pems/node_modules/wopenssl
+264 silly doSerial build 2
+265 silly build nan@2.2.0
+266 info linkStuff nan@2.2.0
+267 silly linkStuff nan@2.2.0 has /home/ubuntu/s2n/tests/pems/node_modules as its parent node_modules
+268 verbose linkBins nan@2.2.0
+269 verbose linkMans nan@2.2.0
+270 silly build wopenssl@0.3.1
+271 info linkStuff wopenssl@0.3.1
+272 silly linkStuff wopenssl@0.3.1 has /home/ubuntu/s2n/tests/pems/node_modules as its parent node_modules
+273 verbose linkBins wopenssl@0.3.1
+274 verbose linkMans wopenssl@0.3.1
+275 silly doSerial global-link 0
+276 silly doParallel update-linked 0
+277 silly doSerial install 2
+278 silly install nan@2.2.0 /home/ubuntu/s2n/tests/pems/node_modules/.staging/nan-3a272677
+279 info lifecycle nan@2.2.0~install: nan@2.2.0
+280 silly lifecycle nan@2.2.0~install: no script for install, continuing
+281 silly install wopenssl@0.3.1 /home/ubuntu/s2n/tests/pems/node_modules/.staging/wopenssl-81293aad
+282 info lifecycle wopenssl@0.3.1~install: wopenssl@0.3.1
+283 verbose lifecycle wopenssl@0.3.1~install: unsafe-perm in lifecycle false
+284 verbose lifecycle wopenssl@0.3.1~install: PATH: /usr/share/npm/bin/node-gyp-bin:/home/ubuntu/s2n/tests/pems/node_modules/wopenssl/node_modules/.bin:/home/ubuntu/s2n/tests/pems/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+285 verbose lifecycle wopenssl@0.3.1~install: CWD: /home/ubuntu/s2n/tests/pems/node_modules/wopenssl
+286 silly lifecycle wopenssl@0.3.1~install: Args: [ '-c', 'node-gyp rebuild' ]
+287 silly lifecycle wopenssl@0.3.1~install: Returned: code: 1  signal: null
+288 info lifecycle wopenssl@0.3.1~install: Failed to exec install script
+289 verbose unlock done using /home/ubuntu/.npm/_locks/staging-979ab528edf20762.lock for /home/ubuntu/s2n/tests/pems/node_modules/.staging
+290 silly rollbackFailedOptional Starting
+291 silly rollbackFailedOptional Finishing
+292 silly runTopLevelLifecycles Starting
+293 silly runTopLevelLifecycles Finishing
+294 silly install printInstalled
+295 warn enoent ENOENT: no such file or directory, open '/home/ubuntu/s2n/tests/pems/package.json'
+296 warn pems No description
+297 warn pems No repository field.
+298 warn pems No README data
+299 warn pems No license field.
+300 verbose stack Error: wopenssl@0.3.1 install: `node-gyp rebuild`
+300 verbose stack Exit status 1
+300 verbose stack     at EventEmitter.<anonymous> (/usr/share/npm/lib/utils/lifecycle.js:232:16)
+300 verbose stack     at emitTwo (events.js:126:13)
+300 verbose stack     at EventEmitter.emit (events.js:214:7)
+300 verbose stack     at ChildProcess.<anonymous> (/usr/share/npm/lib/utils/spawn.js:24:14)
+300 verbose stack     at emitTwo (events.js:126:13)
+300 verbose stack     at ChildProcess.emit (events.js:214:7)
+300 verbose stack     at maybeClose (internal/child_process.js:925:16)
+300 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:209:5)
+301 verbose pkgid wopenssl@0.3.1
+302 verbose cwd /home/ubuntu/s2n/tests/pems
+303 error Linux 5.3.0-1035-aws
+304 error argv "/usr/bin/node" "/usr/bin/npm" "install" "wopenssl"
+305 error node v8.10.0
+306 error npm  v3.5.2
+307 error code ELIFECYCLE
+308 error wopenssl@0.3.1 install: `node-gyp rebuild`
+308 error Exit status 1
+309 error Failed at the wopenssl@0.3.1 install script 'node-gyp rebuild'.
+309 error Make sure you have the latest version of node.js and npm installed.
+309 error If you do, this is most likely a problem with the wopenssl package,
+309 error not with npm itself.
+309 error Tell the author that this fails on your system:
+309 error     node-gyp rebuild
+309 error You can get information on how to open an issue for this project with:
+309 error     npm bugs wopenssl
+309 error Or if that isn't available, you can get their info via:
+309 error     npm owner ls wopenssl
+309 error There is likely additional logging output above.
+310 verbose exit [ 1, true ]
